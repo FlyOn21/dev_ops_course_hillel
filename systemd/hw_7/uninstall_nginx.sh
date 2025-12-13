@@ -7,6 +7,7 @@ log_warn() { echo "$(LOG_TS) | [WARN]  $*" >&2; }
 log_error(){ echo "$(LOG_TS) | [ERROR] $*" >&2; exit 1; }
 
 : "${PORT:=80}"
+: "${SAVE_LOGS:=false}"
 # Parse arguments
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -71,7 +72,7 @@ if [ "${SAVE_LOGS}" = "true" ]; then
   log_info "Saving nginx log files..."
 else
   log_info "Removing nginx log files..."
-  NGINX_LOG_DIR="/var/log/nginx/nginx_${PORT}"
+  NGINX_LOG_DIR="/var/log/nginx_${PORT}"
   if [ -d "${NGINX_LOG_DIR}" ]; then
     sudo rm -rf "${NGINX_LOG_DIR}"
   fi

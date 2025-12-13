@@ -48,6 +48,12 @@ while [ $# -gt 0 ]; do
   esac
 done
 
+#check nginx installed
+if ! command -v nginx >/dev/null 2>&1; then
+  log_error "nginx is not installed. Please install nginx and try again."
+  exit 1
+fi
+
 #check template files exists
 if [ ! -f "$INDEX_HTML_TEMPLATE" ]; then
   log_error "Index HTML template file not found: $INDEX_HTML_TEMPLATE"

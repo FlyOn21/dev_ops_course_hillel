@@ -7,8 +7,8 @@ log_warn() { echo "$(LOG_TS) | [WARN]  $*" >&2; }
 log_error() { echo "$(LOG_TS) | [ERROR] $*" >&2; exit 1; }
 
 : "${PORT:=80}"
-: "${INDEX_HTML_TMPLATE:=./index_html.template}"
-: "${NGINX_CONF_TMPLATE:=./nginx_conf.template}"
+: "${INDEX_HTML_TEMPLATE:=./index_html.template}"
+: "${NGINX_CONF_TEMPLATE:=./nginx_conf.template}"
 : "${ENABLE_SERVICE:=false}"
 
 
@@ -22,7 +22,7 @@ while [ $# -gt 0 ]; do
       echo "  --port PORT                     Port number for nginx (default: 80)"
       echo "  --index-html-template PATH      Path to index HTML template file (default: ./index_html.template)"
       echo "  --nginx-conf-template PATH      Path to nginx config template file (default: ./nginx_conf.template)"
-      echo "  --enable-service                Enable and start the nginx systemd service after installation"
+      echo "  --enable-service                Enable the nginx systemd service after installation"
       exit 0
       ;;
     --port)
@@ -30,11 +30,11 @@ while [ $# -gt 0 ]; do
       shift 2
       ;;
     --index-html-template | -iht)
-      INDEX_HTML_TMPLATE="$2"
+      INDEX_HTML_TEMPLATE="$2"
       shift 2
       ;;
     --nginx-conf-template | -nct)
-      NGINX_CONF_TMPLATE="$2"
+      NGINX_CONF_TEMPLATE="$2"
       shift 2
       ;;
     --enable-service | -es)
@@ -49,14 +49,14 @@ while [ $# -gt 0 ]; do
 done
 
 #check template files exists
-if [ ! -f "$INDEX_HTML_TMPLATE" ]; then
-  log_error "Index HTML template file not found: $INDEX_HTML_TMPLATE"
+if [ ! -f "$INDEX_HTML_TEMPLATE" ]; then
+  log_error "Index HTML template file not found: $INDEX_HTML_TEMPLATE"
 fi
-if [ ! -f "$NGINX_CONF_TMPLATE" ]; then
-  log_error "Nginx config template file not found: $NGINX_CONF_TMPLATE"
+if [ ! -f "$NGINX_CONF_TEMPLATE" ]; then
+  log_error "Nginx config template file not found: $NGINX_CONF_TEMPLATE"
 fi
 
-log_info "Deploying nginx with port=$PORT, index_html=$INDEX_HTML, nginx_conf=$NGINX_CONF"
+log_info "Deploying nginx with port=$PORT, index_html_template=$INDEX_HTML_TEMPLATE, nginx_conf_template=$NGINX_CONF_TEMPLATE"
 # Check install envsubst
 if ! command -v envsubst >/dev/null 2>&1; then
   log_warn "envsubst is not installed. Please install the 'gettext' package."
@@ -65,7 +65,7 @@ if ! command -v envsubst >/dev/null 2>&1; then
   log_info "gettext installed."
 fi
 
-export PORT NGINX_CONF_TMPLATE INDEX_HTML_TMPLATE
+export PORT NGINX_CONF_TEMPLATE INDEX_HTML_TEMPLATE
 # Create nginx config from template
 log_info "Creating nginx config from template..."
 
@@ -77,7 +77,7 @@ else
   sudo mv "$CONF_FILE_PATH" "$CONF_FILE_PATH.bak"
 fi
 
-envsubst '$PORT' < "${NGINX_CONF_TMPLATE}" | sudo tee "$CONF_FILE_PATH" > /dev/null
+envsubst '$PORT' < "${NGINX_CONF_TEMPLATE}" | sudo tee "$CONF_FILE_PATH" > /dev/null
 
 #create index.html from template
 log_info "Creating index.html from template..."
@@ -87,7 +87,7 @@ if [ ! -e "$INDEX_HTML_PATH" ]; then
 else
   sudo mv "$INDEX_HTML_PATH" "$INDEX_HTML_PATH.bak"
 fi
-sudo envsubst '$PORT' < "${INDEX_HTML_TMPLATE}" | sudo tee "$INDEX_HTML_PATH" > /dev/null
+envsubst '$PORT' < "${INDEX_HTML_TEMPLATE}" | sudo tee "$INDEX_HTML_PATH" > /dev/null
 
 # create unit service file
 log_info "Creating systemd service for nginx on port $PORT..."

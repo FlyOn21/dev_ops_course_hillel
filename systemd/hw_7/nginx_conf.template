@@ -1,0 +1,28 @@
+pid /run/nginx_${PORT}.pid;
+worker_processes auto;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+
+    access_log /var/log/nginx_${PORT}/access.log;
+    error_log /var/log/nginx_${PORT}/error.log;
+
+    server {
+        listen ${PORT} default_server;
+        listen [::]:${PORT} default_server;
+
+        root /var/www/html;
+        index index_${PORT}.html;
+
+        server_name _;
+
+        location / {
+            try_files $uri $uri/ =404;
+        }
+    }
+}

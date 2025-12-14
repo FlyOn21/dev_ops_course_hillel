@@ -2,9 +2,9 @@
 set -e
 #logging functions
 log_timestamp() { date +"%Y-%m-%d_%H:%M:%S%z"; }
-log_info()  { echo "$(log_timestamp) | [INFO]  $*"; }
-log_warn() { echo "$(log_timestamp) | [WARN]  $*" >&2; }
-log_error(){ echo "$(log_timestamp) | [ERROR] $*" >&2; exit 1; }
+log_info()  { echo "\033[32m$(log_timestamp) | [INFO]\033[0m $*"; }
+log_warn()  { echo "\033[33m$(log_timestamp) | [WARN]\033[0m $*" >&2; }
+log_error() { echo "\033[31m$(log_timestamp) | [ERROR]\033[0m $*" >&2; }
 
 : "${PORT:=80}"
 : "${SAVE_LOGS:=false}"

@@ -140,12 +140,12 @@ fi
 # reload systemd and start nginx service
 log_info "Reloading systemd daemon..."
 sudo systemctl daemon-reload
-log_info "Enabling and starting nginx service on port $PORT..."
 if
 [ "$ENABLE_SERVICE" = "true" ]; then
   log_info "--enable-service set, enbled service."
   sudo systemctl enable "nginx_${PORT}.service"
 fi
+log_info "Starting nginx service on port $PORT..."
 sudo systemctl start "nginx_${PORT}.service"
 
 

@@ -1,10 +1,10 @@
 #!/bin/sh
 set -e
 #logging functions
-LOG_TS() { date +"%Y-%m-%d %H:%M:%S%z"; }
-log_info()  { echo "$(LOG_TS) | [INFO]  $*"; }
-log_warn() { echo "$(LOG_TS) | [WARN]  $*" >&2; }
-log_error(){ echo "$(LOG_TS) | [ERROR] $*" >&2; exit 1; }
+log_timestamp() { date +"%Y-%m-%d_%H:%M:%S%z"; }
+log_info()  { echo "$(log_timestamp) | [INFO]  $*"; }
+log_warn() { echo "$(log_timestamp) | [WARN]  $*" >&2; }
+log_error(){ echo "$(log_timestamp) | [ERROR] $*" >&2; exit 1; }
 
 : "${PORT:=80}"
 : "${SAVE_LOGS:=false}"

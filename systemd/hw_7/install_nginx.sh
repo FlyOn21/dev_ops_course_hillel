@@ -1,10 +1,11 @@
 #!/bin/sh
 set -e
 #logging functions
-LOG_TS() { date +"%Y-%m-%d %H:%M:%S%z"; }
-log_info() { echo "$(LOG_TS) | [INFO]  $*"; }
-log_warn() { echo "$(LOG_TS) | [WARN]  $*" >&2; }
-log_error() { echo "$(LOG_TS) | [ERROR] $*" >&2; exit 1; }
+log_timestamp() { date +"%Y-%m-%d_%H:%M:%S%z"; }
+bak_timstamp() { date +"%Y%m%d%H%M%S"; }
+log_info() { echo "$(log_timestamp) | [INFO]  $*"; }
+log_warn() { echo "$(log_timestamp) | [WARN]  $*" >&2; }
+log_error() { echo "$(log_timestamp) | [ERROR] $*" >&2; exit 1; }
 
 : "${PORT:=80}"
 : "${INDEX_HTML_TEMPLATE:=./index_html.template}"
@@ -80,7 +81,7 @@ CONF_FILE_PATH="/etc/nginx/sites-available/nginx_${PORT}.conf"
 if [ ! -e "$CONF_FILE_PATH" ]; then
   sudo touch "$CONF_FILE_PATH"
 else
-  sudo mv "$CONF_FILE_PATH" "$CONF_FILE_PATH.bak"
+  sudo mv "$CONF_FILE_PATH" "${CONF_FILE_PATH}_$(bak_timstamp).bak"
 fi
 
 envsubst '$PORT' < "${NGINX_CONF_TEMPLATE}" | sudo tee "$CONF_FILE_PATH" > /dev/null
@@ -91,7 +92,7 @@ INDEX_HTML_PATH="/var/www/html/index_${PORT}.html"
 if [ ! -e "$INDEX_HTML_PATH" ]; then
   sudo touch "$INDEX_HTML_PATH"
 else
-  sudo mv "$INDEX_HTML_PATH" "$INDEX_HTML_PATH.bak"
+  sudo mv "$INDEX_HTML_PATH" "${INDEX_HTML_PATH}_$(bak_timstamp).bak"
 fi
 envsubst '$PORT' < "${INDEX_HTML_TEMPLATE}" | sudo tee "$INDEX_HTML_PATH" > /dev/null
 
@@ -101,7 +102,7 @@ SERVICE_FILE_PATH="/etc/systemd/system/nginx_${PORT}.service"
 if [ ! -e "$SERVICE_FILE_PATH" ]; then
   sudo touch "$SERVICE_FILE_PATH"
 else
-  sudo mv "$SERVICE_FILE_PATH" "$SERVICE_FILE_PATH.bak"
+  sudo mv "$SERVICE_FILE_PATH" "${SERVICE_FILE_PATH}_$(bak_timstamp).bak"
 fi
 sudo tee "$SERVICE_FILE_PATH" > /dev/null <<EOF
 [Unit]

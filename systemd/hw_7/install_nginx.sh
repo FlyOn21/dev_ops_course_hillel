@@ -7,11 +7,16 @@ log_info()  { echo "\033[32m$(log_timestamp) | [INFO]\033[0m $*"; }
 log_warn()  { echo "\033[33m$(log_timestamp) | [WARN]\033[0m $*" >&2; }
 log_error() { echo "\033[31m$(log_timestamp) | [ERROR]\033[0m $*" >&2; }
 
-: "${PORT:=80}"
+: "${PORT}"
 : "${INDEX_HTML_TEMPLATE:=./index_html.template}"
 : "${NGINX_CONF_TEMPLATE:=./nginx_conf.template}"
 : "${ENABLE_SERVICE:=false}"
 
+if [ $# -eq 0 ]; then
+  log_info "No arguments provided. Use --help for usage information."
+  log_error "--port requires a non-empty argument."
+  exit 1
+fi
 
 #parse arguments
 while [ $# -gt 0 ]; do
@@ -28,6 +33,10 @@ while [ $# -gt 0 ]; do
       ;;
     --port)
       PORT="$2"
+      if ! echo "$PORT" | grep -Eq '^[0-9]+$' || [ "$PORT" -lt 1 ] || [ "$PORT" -gt 65535 ]; then
+        log_error "Invalid port number: $PORT. Must be an integer between 1 and 65535."
+        exit 1
+      fi
       shift 2
       ;;
     --index-html-template | -iht)

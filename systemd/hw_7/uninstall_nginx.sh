@@ -1,0 +1,103 @@
+#!/bin/sh
+set -e
+#logging functions
+log_timestamp() { date +"%Y-%m-%d_%H:%M:%S%z"; }
+log_info()  { echo "\033[32m$(log_timestamp) | [INFO]\033[0m $*"; }
+log_warn()  { echo "\033[33m$(log_timestamp) | [WARN]\033[0m $*" >&2; }
+log_error() { echo "\033[31m$(log_timestamp) | [ERROR]\033[0m $*" >&2; }
+
+: "${PORT}"
+: "${SAVE_LOGS:=false}"
+
+if [ $# -eq 0 ]; then
+  log_info "No arguments provided. Use --help for usage information."
+  log_error "--port requires a non-empty argument."
+  exit 1
+fi
+# Parse arguments
+while [ $# -gt 0 ]; do
+  case "$1" in
+  --help | -h)
+    echo "Usage: $0 [--port PORT] [--save-logs]"
+    echo ""
+    echo "Options:"
+    echo "  --port PORT            Port number for nginx (default: 80)"
+    echo "  --save-logs            Save nginx logs instead of deleting them"
+    exit 0
+    ;;
+  --port)
+    PORT="$2"
+    if ! echo "$PORT" | grep -Eq '^[0-9]+$' || [ "$PORT" -lt 1 ] || [ "$PORT" -gt 65535 ]; then
+      log_error "Invalid port number: $PORT. Must be an integer between 1 and 65535."
+      exit 1
+    fi
+    shift 2
+    ;;
+  --save-logs)
+    SAVE_LOGS="true"
+    shift 1
+    ;;
+  *)
+    log_error "Unknown argument: $1"
+    exit 1
+    ;;
+  esac
+done
+
+SERVICE_FILE_PATH="/etc/systemd/system/nginx_${PORT}.service"
+INDEX_HTML_PATH="/var/www/html/index_${PORT}.html"
+
+if [ ! -e "${SERVICE_FILE_PATH}" ]; then
+  log_warn "Nginx service file not found at ${SERVICE_FILE_PATH}. Nginx may not be installed on port=${PORT}."
+  exit 0
+fi
+
+log_info "Uninstalling nginx from port=$PORT"
+# Stop and disable nginx service
+
+log_info "Disabling nginx service..."
+sudo systemctl is-enabled --quiet "nginx_${PORT}.service" && {
+  sudo systemctl disable "nginx_${PORT}.service"
+}
+log_info "Stopping nginx service..."
+sudo systemctl is-active --quiet "nginx_${PORT}.service" && {
+  sudo systemctl stop "nginx_${PORT}.service"
+}
+# Remove service file
+log_info "Removing nginx service file..."
+sudo rm -f "${SERVICE_FILE_PATH}"
+
+# Remove index html file
+log_info "Removing nginx index html file..."
+sudo rm -f "${INDEX_HTML_PATH}"
+
+#remove symlink if exists
+if [ -L "/etc/systemd/system/multi-user.target.wants/nginx_${PORT}.service" ]; then
+  log_info "Removing symlink for nginx service..."
+  sudo rm -f "/etc/systemd/system/multi-user.target.wants/nginx_${PORT}.service"
+fi
+
+#remove log files
+if [ "${SAVE_LOGS}" = "true" ]; then
+  log_info "Saving nginx log files..."
+else
+  log_info "Removing nginx log files..."
+  NGINX_LOG_DIR="/var/log/nginx_${PORT}"
+  if [ -d "${NGINX_LOG_DIR}" ]; then
+    sudo rm -rf "${NGINX_LOG_DIR}"
+  fi
+fi
+
+#remove nginx config file if exists
+NGINX_CONF_PATH="/etc/nginx/sites-available/nginx_${PORT}.conf"
+if [ -f "${NGINX_CONF_PATH}" ]; then
+  log_info "Removing nginx config file..."
+  sudo rm -f "${NGINX_CONF_PATH}"
+fi
+
+# Reload systemd daemon
+log_info "Reloading systemd daemon..."
+sudo systemctl daemon-reload
+
+
+

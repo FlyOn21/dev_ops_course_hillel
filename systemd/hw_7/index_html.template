@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦊 nginx is alive! Nginx open $PORT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            overflow: hidden;
+        }
+        
+        .container {
+            text-align: center;
+            padding: 40px;
+            max-width: 600px;
+        }
+        
+        .nginx-logo {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d9ff, #00ff88, #00d9ff);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient 3s linear infinite;
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+        
+        .subtitle {
+            color: #888;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+        }
+        
+        .port-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .port-label {
+            font-size: 1em;
+            color: #00d9ff;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+        }
+        
+        .port-number {
+            font-size: 5em;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            color: #00ff88;
+            text-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { text-shadow: 0 0 30px rgba(0, 255, 136, 0.5); }
+            50% { text-shadow: 0 0 60px rgba(0, 255, 136, 0.8), 0 0 100px rgba(0, 255, 136, 0.4); }
+        }
+        
+        .port-joke {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 15px;
+            font-style: italic;
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .status-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .status-item .label {
+            font-size: 0.7em;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .status-item .value {
+            font-size: 1.2em;
+            color: #00ff88;
+            margin-top: 5px;
+        }
+        
+        .fun-facts {
+            background: rgba(0, 217, 255, 0.1);
+            border-left: 3px solid #00d9ff;
+            padding: 15px 20px;
+            margin: 20px 0;
+            text-align: left;
+            border-radius: 0 10px 10px 0;
+        }
+        
+        .fun-facts h3 {
+            color: #00d9ff;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+        
+        .fun-facts ul {
+            list-style: none;
+            font-size: 0.85em;
+            color: #aaa;
+        }
+        
+        .fun-facts li {
+            margin: 8px 0;
+        }
+        
+        .fun-facts li::before {
+            content: "🦊 ";
+        }
+        
+        .footer {
+            margin-top: 30px;
+            font-size: 0.8em;
+            color: #555;
+        }
+        
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #00ff88;
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 15s infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        }
+        
+        .blink {
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+        
+        .ascii-art {
+            font-family: monospace;
+            font-size: 10px;
+            color: #444;
+            white-space: pre;
+            margin: 20px 0;
+            line-height: 1.2;
+        }
+
+        .uptime-counter {
+            font-family: 'Courier New', monospace;
+            color: #00d9ff;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="particles">
+        <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+        <div class="particle" style="left: 20%; animation-delay: 2s;"></div>
+        <div class="particle" style="left: 30%; animation-delay: 4s;"></div>
+        <div class="particle" style="left: 40%; animation-delay: 1s;"></div>
+        <div class="particle" style="left: 50%; animation-delay: 3s;"></div>
+        <div class="particle" style="left: 60%; animation-delay: 5s;"></div>
+        <div class="particle" style="left: 70%; animation-delay: 2.5s;"></div>
+        <div class="particle" style="left: 80%; animation-delay: 1.5s;"></div>
+        <div class="particle" style="left: 90%; animation-delay: 4.5s;"></div>
+    </div>
+
+    <div class="container">
+        <div class="nginx-logo">🦊</div>
+        
+        <h1>nginx is vibing!</h1>
+        <p class="subtitle">Your favorite web server is alive and probably overworked</p>
+        
+        <div class="port-box">
+            <div class="port-label">Currently Listening On Port</div>
+            <div class="port-number" id="port">8080</div>
+            <div class="port-joke" id="joke">"I'm not lazy, I'm just in listening mode"</div>
+            <div class="uptime-counter">Uptime: <span id="uptime">0d 0h 0m 0s</span></div>
+        </div>
+        
+        <div class="status-grid">
+            <div class="status-item">
+                <div class="label">Status</div>
+                <div class="value">✅ Alive</div>
+            </div>
+            <div class="status-item">
+                <div class="label">Mood</div>
+                <div class="value" id="mood">😎 Chill</div>
+            </div>
+            <div class="status-item">
+                <div class="label">Requests</div>
+                <div class="value"><span id="requests">0</span><span class="blink">_</span></div>
+            </div>
+        </div>
+        
+        <div class="fun-facts">
+            <h3>🎯 Random nginx Facts:</h3>
+            <ul>
+                <li>nginx handles more traffic than your ex handles their emotions</li>
+                <li>Pronounced "engine-x", not "en-jinx" (we're not cursed... usually)</li>
+                <li>Created in 2004 because Apache was too mainstream</li>
+                <li>This server has been up longer than your New Year's resolutions</li>
+                <li>I could serve 10,000 connections. Your database? Not so much.</li>
+            </ul>
+        </div>
+        
+        <div class="ascii-art">
+    ┌─────────────────────────────────────┐
+    │  Welcome to the backend!            │
+    │  Population: just nginx and bugs    │
+    │  Current activity: waiting for you  │
+    └─────────────────────────────────────┘
+        </div>
+        
+        <div class="footer">
+            <p>Powered by nginx & developer tears 💧</p>
+            <p style="margin-top: 10px;">
+                If you're seeing this page, everything is <span style="color: #00ff88;">probably</span> fine.
+            </p>
+            <p style="margin-top: 5px; font-size: 0.7em; color: #444;">
+                Error 200: Success (yes, that's an HTTP joke)
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Detect port from URL
+        const port = window.location.port || (window.location.protocol === 'https:' ? '443' : '80');
+        document.getElementById('port').textContent = port;
+        
+        // Port-specific jokes
+        const portJokes = {
+            '80': '"Living in the HTTP lane since forever"',
+            '443': '"I put the S in HTTPS — Security, baby!"',
+            '8080': '"The cooler port 80"',
+            '3000': '"Where all the cool Node.js kids hang out"',
+            '5000': '"Flask? Django? Who knows!"',
+            '8000': '"Django was here"',
+            '4200': '"ng serve brought me here"',
+            '3001': '"Port 3000 was taken, obviously"',
+            '9000': '"It\'s over 9000! Wait, it IS 9000."',
+            '5173': '"Vite-ally important port"',
+            '4000': '"GraphQL playground, probably"',
+            '6379': '"Redis? Wrong door, buddy"',
+            '5432': '"PostgreSQL called, wants its port back"',
+            '27017': '"MongoDB is leaking again"',
+        };
+        
+        document.getElementById('joke').textContent = portJokes[port] || '"Just a humble port doing humble things"';
+        
+        // Fake uptime counter
+        let seconds = Math.floor(Math.random() * 86400 * 30); // Random start up to 30 days
+        function updateUptime() {
+            seconds++;
+            const d = Math.floor(seconds / 86400);
+            const h = Math.floor((seconds % 86400) / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = seconds % 60;
+            document.getElementById('uptime').textContent = `${d}d ${h}h ${m}m ${s}s`;
+        }
+        setInterval(updateUptime, 1000);
+        updateUptime();
+        
+        // Fake request counter
+        let requests = Math.floor(Math.random() * 10000);
+        function updateRequests() {
+            requests += Math.floor(Math.random() * 5);
+            document.getElementById('requests').textContent = requests.toLocaleString();
+        }
+        setInterval(updateRequests, Math.random() * 2000 + 500);
+        updateRequests();
+        
+        // Random mood changes
+        const moods = ['😎 Chill', '🔥 Busy', '😴 Sleepy', '🚀 Blazing', '🤔 Thinking', '💪 Strong', '☕ Caffeinated'];
+        function updateMood() {
+            document.getElementById('mood').textContent = moods[Math.floor(Math.random() * moods.length)];
+        }
+        setInterval(updateMood, 5000);
+        
+        // Console easter egg
+        console.log('%c🦊 nginx says hi!', 'font-size: 24px; color: #00ff88;');
+        console.log('%cLooking for bugs? Check the code, not the console 😉', 'color: #888;');
+        console.log(`%cPort ${port} is feeling good today!`, 'color: #00d9ff;');
+        console.log('%cPro tip: Have you tried turning it off and on again?', 'color: #ff6b6b;');
+    </script>
+</body>
+</html>

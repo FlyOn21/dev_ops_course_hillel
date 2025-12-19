@@ -1,0 +1,346 @@
+================== START TASK: systemd_cgroups ==================
+
+COMMAND: sudo sh -c cat > /etc/systemd/system/stress1.service << "EOF"
+[Unit]
+Description=Stress test server1
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/daemonize -c /tmp -p /tmp/stressing.pid /usr/bin/stress -c 2
+PIDFile=/tmp/stressing.pid
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+================================================
+
+● stress1.service - Stress test server1
+     Loaded: loaded (/etc/systemd/system/stress1.service; disabled; preset: enabled)
+     Active: active (running) since Fri 2025-12-19 09:43:12 EET; 12ms ago
+    Process: 3229 ExecStart=/usr/bin/daemonize -c /tmp -p /tmp/stressing.pid /usr/bin/stress -c 2 (code=exited, status=0/SUCCESS)
+   Main PID: 3230 (stress)
+      Tasks: 3 (limit: 38082)
+     Memory: 516.0K (peak: 972.0K)
+        CPU: 12ms
+     CGroup: /system.slice/stress1.service
+             ├─3230 /usr/bin/stress -c 2
+             ├─3232 /usr/bin/stress -c 2
+             └─3233 /usr/bin/stress -c 2
+
+Dec 19 09:43:12 flyon21-PC systemd[1]: Starting stress1.service - Stress test server1...
+Dec 19 09:43:12 flyon21-PC systemd[1]: stress1.service: Failed to parse PID from file /tmp/stressing.pid: No such process
+Dec 19 09:43:12 flyon21-PC systemd[1]: Started stress1.service - Stress test server1.
+COMMAND: systemd-cgtop -n 1 --batch
+/                                                                           43      -   131.7M        -        -
+dev-hugepages.mount                                                          -      -     4.0K        -        -
+init.scope                                                                   1      -     5.6M        -        -
+system.slice                                                                36      -    55.1M        -        -
+system.slice/avahi-daemon.service                                            2      -   836.0K        -        -
+system.slice/console-getty.service                                           1      -   232.0K        -        -
+system.slice/cron.service                                                    1      -   356.0K        -        -
+system.slice/cups-browsed.service                                            4      -     3.3M        -        -
+system.slice/cups.service                                                   15      -    17.1M        -        -
+system.slice/dbus.service                                                    1      -     1.2M        -        -
+system.slice/rsyslog.service                                                 4      -     1.4M        -        -
+system.slice/stress1.service                                                 3      -   476.0K        -        -
+system.slice/system-container\x2dgetty.slice                                 -      -   976.0K        -        -
+system.slice/system-container\x2dgetty.slice/container-getty@1.service       -      -   940.0K        -        -
+system.slice/systemd-journald.service                                        1      -    14.3M        -        -
+system.slice/systemd-logind.service                                          1      -     1.4M        -        -
+system.slice/systemd-resolved.service                                        1      -     2.6M        -        -
+system.slice/unattended-upgrades.service                                     2      -     9.3M        -        -
+user.slice                                                                   6      -    69.2M        -        -
+user.slice/user-1000.slice                                                   6      -    69.1M        -        -
+user.slice/user-1000.slice/session-69.scope                                  4      -    66.1M        -        -
+user.slice/user-1000.slice/user@1000.service                                 2      -     2.9M        -        -
+
+================================================
+
+COMMAND: sudo sh -c cat > /etc/systemd/system/stress1.service << "EOF"
+[Unit]
+Description=Stress test server1
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/daemonize -c /tmp -p /tmp/stressing.pid /usr/bin/stress -c 2
+PIDFile=/tmp/stressing.pid
+MemoryMax=768K
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+================================================
+
+● stress1.service - Stress test server1
+     Loaded: loaded (/etc/systemd/system/stress1.service; disabled; preset: enabled)
+     Active: active (running) since Fri 2025-12-19 09:43:12 EET; 10ms ago
+    Process: 3274 ExecStart=/usr/bin/daemonize -c /tmp -p /tmp/stressing.pid /usr/bin/stress -c 2 (code=exited, status=0/SUCCESS)
+   Main PID: 3275 (stress)
+      Tasks: 3 (limit: 38082)
+     Memory: 744.0K (max: 768.0K available: 24.0K peak: 748.0K)
+        CPU: 8ms
+     CGroup: /system.slice/stress1.service
+             ├─3275 /usr/bin/stress -c 2
+             ├─3277 /usr/bin/stress -c 2
+             └─3278 /usr/bin/stress -c 2
+
+Dec 19 09:43:12 flyon21-PC systemd[1]: Starting stress1.service - Stress test server1...
+Dec 19 09:43:12 flyon21-PC systemd[1]: Started stress1.service - Stress test server1.
+COMMAND: systemd-cgtop -n 1 --batch
+/                                                                           43      -   132.8M        -        -
+dev-hugepages.mount                                                          -      -     4.0K        -        -
+init.scope                                                                   1      -     6.1M        -        -
+system.slice                                                                36      -    55.9M        -        -
+system.slice/avahi-daemon.service                                            2      -   836.0K        -        -
+system.slice/console-getty.service                                           1      -   232.0K        -        -
+system.slice/cron.service                                                    1      -   356.0K        -        -
+system.slice/cups-browsed.service                                            4      -     3.3M        -        -
+system.slice/cups.service                                                   15      -    17.1M        -        -
+system.slice/dbus.service                                                    1      -     1.2M        -        -
+system.slice/rsyslog.service                                                 4      -     1.4M        -        -
+system.slice/stress1.service                                                 3      -   728.0K        -        -
+system.slice/system-container\x2dgetty.slice                                 -      -   976.0K        -        -
+system.slice/system-container\x2dgetty.slice/container-getty@1.service       -      -   940.0K        -        -
+system.slice/systemd-journald.service                                        1      -    14.5M        -        -
+system.slice/systemd-logind.service                                          1      -     1.6M        -        -
+system.slice/systemd-resolved.service                                        1      -     2.6M        -        -
+system.slice/unattended-upgrades.service                                     2      -     9.3M        -        -
+user.slice                                                                   6      -    69.1M        -        -
+user.slice/user-1000.slice                                                   6      -    69.1M        -        -
+user.slice/user-1000.slice/session-69.scope                                  4      -    66.0M        -        -
+user.slice/user-1000.slice/user@1000.service                                 2      -     2.9M        -        -
+
+================================================
+
+COMMAND: sudo sh -c cat > /etc/systemd/system/stress1.service << "EOF"
+[Unit]
+Description=Stress test server1
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/daemonize -c /tmp -p /tmp/stressing1.pid /usr/bin/stress -c 2
+PIDFile=/tmp/stressing1.pid
+CPUWeight=50
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+================================================
+
+COMMAND: sudo sh -c cat > /etc/systemd/system/stress2.service << "EOF"
+[Unit]
+Description=Stress test server2
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/daemonize -c /tmp -p /tmp/stressing2.pid /usr/bin/stress -c 2
+PIDFile=/tmp/stressing2.pid
+CPUWeight=100
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+================================================
+
+COMMAND: sudo systemctl status stress1.service
+● stress1.service - Stress test server1
+     Loaded: loaded (/etc/systemd/system/stress1.service; disabled; preset: enabled)
+     Active: active (running) since Fri 2025-12-19 09:43:13 EET; 29ms ago
+    Process: 3323 ExecStart=/usr/bin/daemonize -c /tmp -p /tmp/stressing1.pid /usr/bin/stress -c 2 (code=exited, status=0/SUCCESS)
+   Main PID: 3324 (stress)
+      Tasks: 3 (limit: 38082)
+     Memory: 696.0K (peak: 1012.0K)
+        CPU: 44ms
+     CGroup: /system.slice/stress1.service
+             ├─3324 /usr/bin/stress -c 2
+             ├─3326 /usr/bin/stress -c 2
+             └─3327 /usr/bin/stress -c 2
+
+Dec 19 09:43:13 flyon21-PC systemd[1]: Starting stress1.service - Stress test server1...
+Dec 19 09:43:13 flyon21-PC systemd[1]: Started stress1.service - Stress test server1.
+
+================================================
+
+COMMAND: sudo systemctl status stress2.service
+● stress2.service - Stress test server2
+     Loaded: loaded (/etc/systemd/system/stress2.service; disabled; preset: enabled)
+     Active: active (running) since Fri 2025-12-19 09:43:13 EET; 25ms ago
+    Process: 3332 ExecStart=/usr/bin/daemonize -c /tmp -p /tmp/stressing2.pid /usr/bin/stress -c 2 (code=exited, status=0/SUCCESS)
+   Main PID: 3333 (stress)
+      Tasks: 3 (limit: 38082)
+     Memory: 960.0K (peak: 1.6M)
+        CPU: 40ms
+     CGroup: /system.slice/stress2.service
+             ├─3333 /usr/bin/stress -c 2
+             ├─3335 /usr/bin/stress -c 2
+             └─3336 /usr/bin/stress -c 2
+
+Dec 19 09:43:13 flyon21-PC systemd[1]: Starting stress2.service - Stress test server2...
+Dec 19 09:43:13 flyon21-PC systemd[1]: Started stress2.service - Stress test server2.
+
+================================================
+
+COMMAND: sudo sh -c cat > /etc/systemd/system/stress3.service << "EOF"
+[Unit]
+Description=Stress test server3
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/daemonize -c /tmp -p /tmp/stressing3.pid /usr/bin/stress -c 2
+PIDFile=/tmp/stressing3.pid
+CPUWeight=300
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+================================================
+
+● stress3.service - Stress test server3
+     Loaded: loaded (/etc/systemd/system/stress3.service; disabled; preset: enabled)
+     Active: active (running) since Fri 2025-12-19 09:43:13 EET; 14ms ago
+    Process: 3379 ExecStart=/usr/bin/daemonize -c /tmp -p /tmp/stressing3.pid /usr/bin/stress -c 2 (code=exited, status=0/SUCCESS)
+   Main PID: 3380 (stress)
+      Tasks: 3 (limit: 38082)
+     Memory: 748.0K (peak: 1.0M)
+        CPU: 14ms
+     CGroup: /system.slice/stress3.service
+             ├─3380 /usr/bin/stress -c 2
+             ├─3381 /usr/bin/stress -c 2
+             └─3382 /usr/bin/stress -c 2
+
+Dec 19 09:43:13 flyon21-PC systemd[1]: Starting stress3.service - Stress test server3...
+Dec 19 09:43:13 flyon21-PC systemd[1]: Started stress3.service - Stress test server3.
+COMMAND: systemctl cat stress1.service
+# /etc/systemd/system/stress1.service
+[Unit]
+Description=Stress test server1
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/daemonize -c /tmp -p /tmp/stressing1.pid /usr/bin/stress -c 2
+PIDFile=/tmp/stressing1.pid
+CPUWeight=50
+
+[Install]
+WantedBy=multi-user.target
+
+================================================
+
+COMMAND: systemctl cat stress2.service
+# /etc/systemd/system/stress2.service
+[Unit]
+Description=Stress test server2
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/daemonize -c /tmp -p /tmp/stressing2.pid /usr/bin/stress -c 2
+PIDFile=/tmp/stressing2.pid
+CPUWeight=100
+
+[Install]
+WantedBy=multi-user.target
+
+================================================
+
+COMMAND: systemctl cat stress3.service
+# /etc/systemd/system/stress3.service
+[Unit]
+Description=Stress test server3
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/daemonize -c /tmp -p /tmp/stressing3.pid /usr/bin/stress -c 2
+PIDFile=/tmp/stressing3.pid
+CPUWeight=300
+
+[Install]
+WantedBy=multi-user.target
+
+================================================
+
+COMMAND: systemd-cgtop -n 3 --batch
+/                                                                           49      -   134.0M        -        -
+dev-hugepages.mount                                                          -      -     4.0K        -        -
+init.scope                                                                   1      -     5.9M        -        -
+system.slice                                                                42      -    57.0M        -        -
+system.slice/avahi-daemon.service                                            2      -   836.0K        -        -
+system.slice/console-getty.service                                           1      -   232.0K        -        -
+system.slice/cron.service                                                    1      -   356.0K        -        -
+system.slice/cups-browsed.service                                            4      -     3.3M        -        -
+system.slice/cups.service                                                   15      -    17.1M        -        -
+system.slice/dbus.service                                                    1      -     1.7M        -        -
+system.slice/rsyslog.service                                                 4      -     1.4M        -        -
+system.slice/stress1.service                                                 3      -   696.0K        -        -
+system.slice/stress2.service                                                 3      -   480.0K        -        -
+system.slice/stress3.service                                                 3      -   492.0K        -        -
+system.slice/system-container\x2dgetty.slice                                 -      -   976.0K        -        -
+system.slice/system-container\x2dgetty.slice/container-getty@1.service       -      -   940.0K        -        -
+system.slice/systemd-journald.service                                        1      -    14.4M        -        -
+system.slice/systemd-logind.service                                          1      -     1.4M        -        -
+system.slice/systemd-resolved.service                                        1      -     2.6M        -        -
+system.slice/unattended-upgrades.service                                     2      -     9.3M        -        -
+user.slice                                                                   6      -    69.3M        -        -
+user.slice/user-1000.slice                                                   6      -    69.3M        -        -
+user.slice/user-1000.slice/session-69.scope                                  4      -    66.2M        -        -
+user.slice/user-1000.slice/user@1000.service                                 2      -     2.9M        -        -
+
+system.slice                                                                42  600.3    56.3M        -        -
+/                                                                           49  600.2   132.4M        -        -
+system.slice/stress3.service                                                 3  200.1   492.0K        -        -
+system.slice/stress2.service                                                 3  199.9   480.0K        -        -
+system.slice/stress1.service                                                 3  199.9   468.0K        -        -
+user.slice                                                                   6    0.4    68.8M        -        -
+user.slice/user-1000.slice                                                   6    0.4    68.8M        -        -
+user.slice/user-1000.slice/session-69.scope                                  4    0.4    65.8M        -        -
+system.slice/systemd-journald.service                                        1    0.0    14.4M        -        -
+dev-hugepages.mount                                                          -      -     4.0K        -        -
+init.scope                                                                   1      -     5.5M        -        -
+system.slice/avahi-daemon.service                                            2      -   836.0K        -        -
+system.slice/console-getty.service                                           1      -   232.0K        -        -
+system.slice/cron.service                                                    1      -   356.0K        -        -
+system.slice/cups-browsed.service                                            4      -     3.3M        -        -
+system.slice/cups.service                                                   15      -    17.1M        -        -
+system.slice/dbus.service                                                    1      -     1.2M        -        -
+system.slice/rsyslog.service                                                 4      -     1.4M        -        -
+system.slice/system-container\x2dgetty.slice                                 -      -   976.0K        -        -
+system.slice/system-container\x2dgetty.slice/container-getty@1.service       -      -   940.0K        -        -
+system.slice/systemd-logind.service                                          1      -     1.4M        -        -
+system.slice/systemd-resolved.service                                        1      -     2.6M        -        -
+system.slice/unattended-upgrades.service                                     2      -     9.3M        -        -
+user.slice/user-1000.slice/user@1000.service                                 2      -     2.9M        -        -
+
+/                                                                           49  602.5   132.4M        -        -
+system.slice                                                                42  600.5    56.3M        -        -
+system.slice/stress3.service                                                 3  199.9   492.0K        -        -
+system.slice/stress1.service                                                 3  199.9   468.0K        -        -
+system.slice/stress2.service                                                 3  199.9   480.0K        -        -
+init.scope                                                                   1    0.9     5.5M        -        -
+user.slice                                                                   6    0.5    68.8M        -        -
+user.slice/user-1000.slice                                                   6    0.5    68.8M        -        -
+user.slice/user-1000.slice/session-69.scope                                  4    0.5    65.8M        -        -
+system.slice/systemd-journald.service                                        1    0.1    14.4M        -        -
+system.slice/dbus.service                                                    1    0.1     1.2M        -        -
+system.slice/systemd-logind.service                                          1    0.0     1.4M        -        -
+system.slice/rsyslog.service                                                 4    0.0     1.4M        -        -
+dev-hugepages.mount                                                          -      -     4.0K        -        -
+system.slice/avahi-daemon.service                                            2      -   836.0K        -        -
+system.slice/console-getty.service                                           1      -   232.0K        -        -
+system.slice/cron.service                                                    1      -   356.0K        -        -
+system.slice/cups-browsed.service                                            4      -     3.3M        -        -
+system.slice/cups.service                                                   15      -    17.1M        -        -
+system.slice/system-container\x2dgetty.slice                                 -      -   976.0K        -        -
+system.slice/system-container\x2dgetty.slice/container-getty@1.service       -      -   940.0K        -        -
+system.slice/systemd-resolved.service                                        1      -     2.6M        -        -
+system.slice/unattended-upgrades.service                                     2      -     9.3M        -        -
+user.slice/user-1000.slice/user@1000.service                                 2      -     2.9M        -        -
+
+================================================
+
+
+================== END TASK: systemd_cgroups ==================
+

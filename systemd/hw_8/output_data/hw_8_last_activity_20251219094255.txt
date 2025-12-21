@@ -1,0 +1,846 @@
+================== START TASK: last_activity ==================
+
+COMMAND: ps xawf
+    PID TTY      STAT   TIME COMMAND
+      1 ?        Ss     0:03 /usr/lib/systemd/systemd
+     19 ?        Ss     0:00 /usr/lib/systemd/systemd-journald
+     67 ?        Ss     0:00 /usr/lib/systemd/systemd-resolved
+     71 ?        S<s    0:00 /usr/lib/systemd/systemd-logind
+     72 ?        Ss     0:00 avahi-daemon: running [flyon21-PC.local]
+     79 ?        S      0:00  \_ avahi-daemon: chroot helper
+     73 ?        Ss     0:00 /usr/sbin/cron -f -P
+     75 ?        Ss     0:00 @dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
+     95 pts/0    Ss+    0:00 /sbin/agetty -o -p -- \u --noclear --keep-baud - 115200,38400,9600 vt220
+     97 ?        Ssl    0:00 /usr/bin/python3 /usr/share/unattended-upgrades/unattended-upgrade-shutdown --wait-for-signal
+     99 ?        Ssl    0:00 /usr/sbin/rsyslogd -n -iNONE
+    494 pts/1    Ss     0:00 /bin/login -p --
+    550 pts/1    S      0:00  \_ -bash
+   2824 pts/1    S+     0:00      \_ /bin/sh ./hw_8_task_flow.sh
+   2828 pts/1    R+     0:00          \_ ps xawf
+    538 ?        Ss     0:00 /usr/lib/systemd/systemd --user
+    539 ?        S      0:00  \_ (sd-pam)
+   2176 ?        Ss     0:00 /usr/sbin/cupsd -l
+   2177 ?        S      0:00  \_ /usr/lib/cups/notifier/dbus dbus://
+   2178 ?        S      0:00  \_ /usr/lib/cups/notifier/dbus dbus://
+   2179 ?        S      0:00  \_ /usr/lib/cups/notifier/dbus dbus://
+   2180 ?        S      0:00  \_ /usr/lib/cups/notifier/dbus dbus://
+   2181 ?        S      0:00  \_ /usr/lib/cups/notifier/dbus dbus://
+   2182 ?        S      0:00  \_ /usr/lib/cups/notifier/dbus dbus://
+   2183 ?        S      0:00  \_ /usr/lib/cups/notifier/dbus dbus://
+   2184 ?        S      0:00  \_ /usr/lib/cups/notifier/dbus dbus://
+   2185 ?        S      0:00  \_ /usr/lib/cups/notifier/dbus dbus://
+   2186 ?        S      0:00  \_ /usr/lib/cups/notifier/dbus dbus://
+   2187 ?        S      0:00  \_ /usr/lib/cups/notifier/dbus dbus://
+   2188 ?        S      0:00  \_ /usr/lib/cups/notifier/dbus dbus://
+   2189 ?        S      0:00  \_ /usr/lib/cups/notifier/dbus dbus://
+   2190 ?        S      0:00  \_ /usr/lib/cups/notifier/dbus dbus://
+   2231 ?        Ssl    0:00 /usr/sbin/cups-browsed
+
+================================================
+
+COMMAND: systemd-analyze
+Startup finished in 279ms (userspace) 
+multi-user.target reached after 267ms in userspace.
+
+================================================
+
+COMMAND: systemd-analyze blame
+69ms rsyslog.service
+55ms systemd-resolved.service
+44ms user@1000.service
+27ms user-runtime-dir@1000.service
+26ms systemd-logind.service
+22ms systemd-journal-flush.service
+20ms avahi-daemon.service
+17ms keyboard-setup.service
+13ms systemd-journald.service
+12ms blahwoof.service
+12ms dbus.service
+11ms systemd-user-sessions.service
+11ms cups.service
+ 7ms systemd-tmpfiles-clean.service
+ 7ms systemd-tmpfiles-setup-dev.service
+ 7ms systemd-tmpfiles-setup.service
+ 6ms systemd-update-utmp-runlevel.service
+ 6ms systemd-sysctl.service
+ 5ms systemd-tmpfiles-setup-dev-early.service
+ 4ms systemd-update-utmp.service
+ 4ms console-setup.service
+ 4ms systemd-remount-fs.service
+ 3ms dev-hugepages.mount
+
+================================================
+
+COMMAND: systemd-analyze critical-chain
+The time when unit became active or started is printed after the "@" character.
+The time the unit took to start is printed after the "+" character.
+
+multi-user.target @267ms
+└─rsyslog.service @197ms +69ms
+  └─basic.target @179ms
+    └─sockets.target @179ms
+      └─ssh.socket @179ms
+        └─sysinit.target @178ms
+          └─systemd-resolved.service @122ms +55ms
+            └─systemd-tmpfiles-setup.service @114ms +7ms
+              └─systemd-journal-flush.service @76ms +22ms
+                └─systemd-journald.service @61ms +13ms
+                  └─systemd-journald.socket @59ms
+                    └─system.slice @49ms
+                      └─-.slice @49ms
+
+================================================
+
+COMMAND: sh -c systemd-analyze plot > bootup.svg
+
+================================================
+
+COMMAND: sh -c systemd-analyze dot --to-pattern='*.target' --from-pattern='*.target' | dot -Tsvg > targets.svg
+   Color legend: black     = Requires
+                 dark blue = Requisite
+                 dark grey = Wants
+                 red       = Conflicts
+                 green     = After
+
+================================================
+
+COMMAND: systemctl show-environment
+LANG=C.UTF-8
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+
+================================================
+
+COMMAND: systemctl cat ssh.service
+# /usr/lib/systemd/system/ssh.service
+[Unit]
+Description=OpenBSD Secure Shell server
+Documentation=man:sshd(8) man:sshd_config(5)
+After=network.target auditd.service
+ConditionPathExists=!/etc/ssh/sshd_not_to_be_run
+
+[Service]
+EnvironmentFile=-/etc/default/ssh
+ExecStartPre=/usr/sbin/sshd -t
+ExecStart=/usr/sbin/sshd -D $SSHD_OPTS
+ExecReload=/usr/sbin/sshd -t
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+Restart=on-failure
+RestartPreventExitStatus=255
+Type=notify
+RuntimeDirectory=sshd
+RuntimeDirectoryMode=0755
+
+[Install]
+WantedBy=multi-user.target
+Alias=sshd.service
+
+================================================
+
+COMMAND: systemctl show ssh.service
+Type=notify
+ExitType=main
+Restart=on-failure
+RestartMode=normal
+NotifyAccess=main
+RestartUSec=100ms
+RestartSteps=0
+RestartMaxDelayUSec=infinity
+RestartUSecNext=100ms
+TimeoutStartUSec=1min 30s
+TimeoutStopUSec=1min 30s
+TimeoutAbortUSec=1min 30s
+TimeoutStartFailureMode=terminate
+TimeoutStopFailureMode=terminate
+RuntimeMaxUSec=infinity
+RuntimeRandomizedExtraUSec=0
+WatchdogUSec=infinity
+WatchdogTimestampMonotonic=0
+RootDirectoryStartOnly=no
+RemainAfterExit=no
+GuessMainPID=yes
+RestartPreventExitStatus=255
+MainPID=0
+ControlPID=0
+FileDescriptorStoreMax=0
+NFileDescriptorStore=0
+FileDescriptorStorePreserve=restart
+StatusErrno=0
+Result=success
+ReloadResult=success
+CleanResult=success
+UID=[not set]
+GID=[not set]
+NRestarts=0
+OOMPolicy=stop
+ReloadSignal=1
+ExecMainStartTimestampMonotonic=0
+ExecMainExitTimestampMonotonic=0
+ExecMainPID=0
+ExecMainCode=0
+ExecMainStatus=0
+ExecStartPre={ path=/usr/sbin/sshd ; argv[]=/usr/sbin/sshd -t ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }
+ExecStartPreEx={ path=/usr/sbin/sshd ; argv[]=/usr/sbin/sshd -t ; flags= ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }
+ExecStart={ path=/usr/sbin/sshd ; argv[]=/usr/sbin/sshd -D $SSHD_OPTS ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }
+ExecStartEx={ path=/usr/sbin/sshd ; argv[]=/usr/sbin/sshd -D $SSHD_OPTS ; flags= ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }
+ExecReload={ path=/usr/sbin/sshd ; argv[]=/usr/sbin/sshd -t ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }
+ExecReload={ path=/bin/kill ; argv[]=/bin/kill -HUP $MAINPID ; ignore_errors=no ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }
+ExecReloadEx={ path=/usr/sbin/sshd ; argv[]=/usr/sbin/sshd -t ; flags= ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }
+ExecReloadEx={ path=/bin/kill ; argv[]=/bin/kill -HUP $MAINPID ; flags= ; start_time=[n/a] ; stop_time=[n/a] ; pid=0 ; code=(null) ; status=0/0 }
+Slice=system.slice
+ControlGroupId=0
+MemoryCurrent=[not set]
+MemoryPeak=[not set]
+MemorySwapCurrent=[not set]
+MemorySwapPeak=[not set]
+MemoryZSwapCurrent=[not set]
+MemoryAvailable=33230974976
+CPUUsageNSec=[not set]
+TasksCurrent=[not set]
+IPIngressBytes=[no data]
+IPIngressPackets=[no data]
+IPEgressBytes=[no data]
+IPEgressPackets=[no data]
+IOReadBytes=[not set]
+IOReadOperations=[not set]
+IOWriteBytes=[not set]
+IOWriteOperations=[not set]
+Delegate=no
+CPUAccounting=yes
+CPUWeight=[not set]
+StartupCPUWeight=[not set]
+CPUShares=[not set]
+StartupCPUShares=[not set]
+CPUQuotaPerSecUSec=infinity
+CPUQuotaPeriodUSec=infinity
+IOAccounting=no
+IOWeight=[not set]
+StartupIOWeight=[not set]
+BlockIOAccounting=no
+BlockIOWeight=[not set]
+StartupBlockIOWeight=[not set]
+MemoryAccounting=yes
+DefaultMemoryLow=0
+DefaultStartupMemoryLow=0
+DefaultMemoryMin=0
+MemoryMin=0
+MemoryLow=0
+StartupMemoryLow=0
+MemoryHigh=infinity
+StartupMemoryHigh=infinity
+MemoryMax=infinity
+StartupMemoryMax=infinity
+MemorySwapMax=infinity
+StartupMemorySwapMax=infinity
+MemoryZSwapMax=infinity
+StartupMemoryZSwapMax=infinity
+MemoryLimit=infinity
+DevicePolicy=auto
+TasksAccounting=yes
+TasksMax=38082
+IPAccounting=no
+ManagedOOMSwap=auto
+ManagedOOMMemoryPressure=auto
+ManagedOOMMemoryPressureLimit=0
+ManagedOOMPreference=none
+MemoryPressureWatch=auto
+MemoryPressureThresholdUSec=200ms
+CoredumpReceive=no
+EnvironmentFiles=/etc/default/ssh (ignore_errors=yes)
+UMask=0022
+LimitCPU=infinity
+LimitCPUSoft=infinity
+LimitFSIZE=infinity
+LimitFSIZESoft=infinity
+LimitDATA=infinity
+LimitDATASoft=infinity
+LimitSTACK=infinity
+LimitSTACKSoft=8388608
+LimitCORE=infinity
+LimitCORESoft=0
+LimitRSS=infinity
+LimitRSSSoft=infinity
+LimitNOFILE=524288
+LimitNOFILESoft=1024
+LimitAS=infinity
+LimitASSoft=infinity
+LimitNPROC=126942
+LimitNPROCSoft=126942
+LimitMEMLOCK=8388608
+LimitMEMLOCKSoft=8388608
+LimitLOCKS=infinity
+LimitLOCKSSoft=infinity
+LimitSIGPENDING=126942
+LimitSIGPENDINGSoft=126942
+LimitMSGQUEUE=819200
+LimitMSGQUEUESoft=819200
+LimitNICE=0
+LimitNICESoft=0
+LimitRTPRIO=0
+LimitRTPRIOSoft=0
+LimitRTTIME=infinity
+LimitRTTIMESoft=infinity
+RootEphemeral=no
+OOMScoreAdjust=0
+CoredumpFilter=0x33
+Nice=0
+IOSchedulingClass=2
+IOSchedulingPriority=4
+CPUSchedulingPolicy=0
+CPUSchedulingPriority=0
+CPUAffinityFromNUMA=no
+NUMAPolicy=n/a
+TimerSlackNSec=50000
+CPUSchedulingResetOnFork=no
+NonBlocking=no
+StandardInput=null
+StandardOutput=journal
+StandardError=inherit
+TTYReset=no
+TTYVHangup=no
+TTYVTDisallocate=no
+SyslogPriority=30
+SyslogLevelPrefix=yes
+SyslogLevel=6
+SyslogFacility=3
+LogLevelMax=-1
+LogRateLimitIntervalUSec=0
+LogRateLimitBurst=0
+SecureBits=0
+CapabilityBoundingSet=cap_chown cap_dac_override cap_dac_read_search cap_fowner cap_fsetid cap_kill cap_setgid cap_setuid cap_setpcap cap_linux_immutable cap_net_bind_service cap_net_broadcast cap_net_admin cap_net_raw cap_ipc_lock cap_ipc_owner cap_sys_module cap_sys_rawio cap_sys_chroot cap_sys_ptrace cap_sys_pacct cap_sys_admin cap_sys_boot cap_sys_nice cap_sys_resource cap_sys_time cap_sys_tty_config cap_mknod cap_lease cap_audit_write cap_audit_control cap_setfcap cap_mac_override cap_mac_admin cap_syslog cap_wake_alarm cap_block_suspend cap_audit_read cap_perfmon cap_bpf cap_checkpoint_restore
+DynamicUser=no
+SetLoginEnvironment=no
+RemoveIPC=no
+PrivateTmp=no
+PrivateDevices=no
+ProtectClock=no
+ProtectKernelTunables=no
+ProtectKernelModules=no
+ProtectKernelLogs=no
+ProtectControlGroups=no
+PrivateNetwork=no
+PrivateUsers=no
+PrivateMounts=no
+PrivateIPC=no
+ProtectHome=no
+ProtectSystem=no
+SameProcessGroup=no
+UtmpMode=init
+IgnoreSIGPIPE=yes
+NoNewPrivileges=no
+SystemCallErrorNumber=2147483646
+LockPersonality=no
+RuntimeDirectoryPreserve=no
+RuntimeDirectoryMode=0755
+RuntimeDirectory=sshd
+StateDirectoryMode=0755
+CacheDirectoryMode=0755
+LogsDirectoryMode=0755
+ConfigurationDirectoryMode=0755
+TimeoutCleanUSec=infinity
+MemoryDenyWriteExecute=no
+RestrictRealtime=no
+RestrictSUIDSGID=no
+RestrictNamespaces=no
+MountAPIVFS=no
+KeyringMode=private
+ProtectProc=default
+ProcSubset=all
+ProtectHostname=no
+MemoryKSM=no
+RootImagePolicy=root=verity+signed+encrypted+unprotected+absent:usr=verity+signed+encrypted+unprotected+absent:home=encrypted+unprotected+absent:srv=encrypted+unprotected+absent:tmp=encrypted+unprotected+absent:var=encrypted+unprotected+absent
+MountImagePolicy=root=verity+signed+encrypted+unprotected+absent:usr=verity+signed+encrypted+unprotected+absent:home=encrypted+unprotected+absent:srv=encrypted+unprotected+absent:tmp=encrypted+unprotected+absent:var=encrypted+unprotected+absent
+ExtensionImagePolicy=root=verity+signed+encrypted+unprotected+absent:usr=verity+signed+encrypted+unprotected+absent:home=encrypted+unprotected+absent:srv=encrypted+unprotected+absent:tmp=encrypted+unprotected+absent:var=encrypted+unprotected+absent
+KillMode=process
+KillSignal=15
+RestartKillSignal=15
+FinalKillSignal=9
+SendSIGKILL=yes
+SendSIGHUP=no
+WatchdogSignal=6
+Id=ssh.service
+Names=ssh.service
+Requires=sysinit.target ssh.socket system.slice
+Conflicts=shutdown.target
+Before=shutdown.target
+After=system.slice systemd-journald.socket -.mount ssh.socket basic.target auditd.service sysinit.target network.target
+TriggeredBy=ssh.socket
+RequiresMountsFor=/run/sshd
+Documentation="man:sshd(8)" "man:sshd_config(5)"
+Description=OpenBSD Secure Shell server
+LoadState=loaded
+ActiveState=inactive
+FreezerState=running
+SubState=dead
+FragmentPath=/usr/lib/systemd/system/ssh.service
+UnitFileState=disabled
+UnitFilePreset=enabled
+StateChangeTimestamp=Fri 2025-12-19 09:35:40 EET
+StateChangeTimestampMonotonic=18617767706
+InactiveExitTimestampMonotonic=0
+ActiveEnterTimestampMonotonic=0
+ActiveExitTimestampMonotonic=0
+InactiveEnterTimestampMonotonic=0
+CanStart=yes
+CanStop=yes
+CanReload=yes
+CanIsolate=no
+CanClean=runtime
+CanFreeze=yes
+StopWhenUnneeded=no
+RefuseManualStart=no
+RefuseManualStop=no
+AllowIsolate=no
+DefaultDependencies=yes
+SurviveFinalKillSignal=no
+OnSuccessJobMode=fail
+OnFailureJobMode=replace
+IgnoreOnIsolate=no
+NeedDaemonReload=no
+JobTimeoutUSec=infinity
+JobRunningTimeoutUSec=infinity
+JobTimeoutAction=none
+ConditionResult=no
+AssertResult=no
+ConditionTimestampMonotonic=0
+AssertTimestampMonotonic=0
+Transient=no
+Perpetual=no
+StartLimitIntervalUSec=10s
+StartLimitBurst=5
+StartLimitAction=none
+FailureAction=none
+SuccessAction=none
+CollectMode=inactive
+
+================================================
+
+COMMAND: systemctl show ssh.service -p ExecMainPID
+ExecMainPID=0
+
+================================================
+
+COMMAND: systemctl show ssh.service -p ExecMainPID --value
+0
+
+================================================
+
+COMMAND: systemctl status cups
+● cups.service - CUPS Scheduler
+     Loaded: loaded (/usr/lib/systemd/system/cups.service; enabled; preset: enabled)
+     Active: active (running) since Fri 2025-12-19 09:40:14 EET; 2min 41s ago
+TriggeredBy: ● cups.path
+             ● cups.socket
+       Docs: man:cupsd(8)
+   Main PID: 2176 (cupsd)
+     Status: "Scheduler is running..."
+      Tasks: 15 (limit: 38082)
+     Memory: 17.1M (peak: 19.4M)
+        CPU: 99ms
+     CGroup: /system.slice/cups.service
+             ├─2176 /usr/sbin/cupsd -l
+             ├─2177 /usr/lib/cups/notifier/dbus dbus://
+             ├─2178 /usr/lib/cups/notifier/dbus dbus://
+             ├─2179 /usr/lib/cups/notifier/dbus dbus://
+             ├─2180 /usr/lib/cups/notifier/dbus dbus://
+             ├─2181 /usr/lib/cups/notifier/dbus dbus://
+             ├─2182 /usr/lib/cups/notifier/dbus dbus://
+             ├─2183 /usr/lib/cups/notifier/dbus dbus://
+             ├─2184 /usr/lib/cups/notifier/dbus dbus://
+             ├─2185 /usr/lib/cups/notifier/dbus dbus://
+             ├─2186 /usr/lib/cups/notifier/dbus dbus://
+             ├─2187 /usr/lib/cups/notifier/dbus dbus://
+             ├─2188 /usr/lib/cups/notifier/dbus dbus://
+             ├─2189 /usr/lib/cups/notifier/dbus dbus://
+             └─2190 /usr/lib/cups/notifier/dbus dbus://
+
+Dec 19 09:40:14 flyon21-PC systemd[1]: Starting cups.service - CUPS Scheduler...
+Dec 19 09:40:14 flyon21-PC systemd[1]: Started cups.service - CUPS Scheduler.
+
+================================================
+
+COMMAND: sudo systemctl stop cups
+
+================================================
+
+COMMAND: systemctl status cups
+○ cups.service - CUPS Scheduler
+     Loaded: loaded (/usr/lib/systemd/system/cups.service; enabled; preset: enabled)
+     Active: inactive (dead) since Fri 2025-12-19 09:42:55 EET; 7ms ago
+   Duration: 2min 41.496s
+TriggeredBy: ○ cups.path
+             ○ cups.socket
+       Docs: man:cupsd(8)
+    Process: 2176 ExecStart=/usr/sbin/cupsd -l (code=exited, status=0/SUCCESS)
+   Main PID: 2176 (code=exited, status=0/SUCCESS)
+     Status: "Scheduler is running..."
+        CPU: 122ms
+
+Dec 19 09:40:14 flyon21-PC systemd[1]: Starting cups.service - CUPS Scheduler...
+Dec 19 09:40:14 flyon21-PC systemd[1]: Started cups.service - CUPS Scheduler.
+Dec 19 09:42:55 flyon21-PC systemd[1]: Stopping cups.service - CUPS Scheduler...
+Dec 19 09:42:55 flyon21-PC systemd[1]: cups.service: Deactivated successfully.
+Dec 19 09:42:55 flyon21-PC systemd[1]: Stopped cups.service - CUPS Scheduler.
+
+================================================
+
+COMMAND: sudo systemctl start cups
+
+================================================
+
+COMMAND: systemctl cat cups.service
+# /usr/lib/systemd/system/cups.service
+[Unit]
+Description=CUPS Scheduler
+Documentation=man:cupsd(8)
+After=network.target nss-user-lookup.target nslcd.service
+Requires=cups.socket
+
+[Service]
+ExecStart=/usr/sbin/cupsd -l
+Type=notify
+Restart=on-failure
+
+
+[Install]
+Also=cups.socket cups.path
+WantedBy=printer.target multi-user.target
+
+================================================
+
+COMMAND: systemctl show cups -p MemoryMax
+MemoryMax=infinity
+
+================================================
+
+COMMAND: sudo systemctl set-property cups MemoryMax=2G
+
+================================================
+
+COMMAND: systemctl cat cups.service
+# /usr/lib/systemd/system/cups.service
+[Unit]
+Description=CUPS Scheduler
+Documentation=man:cupsd(8)
+After=network.target nss-user-lookup.target nslcd.service
+Requires=cups.socket
+
+[Service]
+ExecStart=/usr/sbin/cupsd -l
+Type=notify
+Restart=on-failure
+
+
+[Install]
+Also=cups.socket cups.path
+WantedBy=printer.target multi-user.target
+
+# /etc/systemd/system.control/cups.service.d/50-MemoryMax.conf
+# This is a drop-in unit file extension, created via "systemctl set-property"
+# or an equivalent operation. Do not edit.
+[Service]
+MemoryMax=2147483648
+
+================================================
+
+COMMAND: systemctl show cups -p MemoryMax
+MemoryMax=2147483648
+
+================================================
+
+COMMAND: sudo systemctl stop cups.service
+
+================================================
+
+COMMAND: sudo rm -rf /etc/systemd/system.control/cups.service.d
+
+================================================
+
+COMMAND: sudo systemctl daemon-reload
+
+================================================
+
+COMMAND: sudo systemctl restart cups.service
+
+================================================
+
+COMMAND: sudo systemctl cat cups.service
+# /usr/lib/systemd/system/cups.service
+[Unit]
+Description=CUPS Scheduler
+Documentation=man:cupsd(8)
+After=network.target nss-user-lookup.target nslcd.service
+Requires=cups.socket
+
+[Service]
+ExecStart=/usr/sbin/cupsd -l
+Type=notify
+Restart=on-failure
+
+
+[Install]
+Also=cups.socket cups.path
+WantedBy=printer.target multi-user.target
+
+================================================
+
+COMMAND: sudo systemctl status cups.service
+● cups.service - CUPS Scheduler
+     Loaded: loaded (/usr/lib/systemd/system/cups.service; enabled; preset: enabled)
+     Active: active (running) since Fri 2025-12-19 09:42:56 EET; 25ms ago
+TriggeredBy: ○ cups.path
+             ● cups.socket
+       Docs: man:cupsd(8)
+   Main PID: 2923 (cupsd)
+     Status: "Scheduler is running..."
+      Tasks: 15 (limit: 38082)
+     Memory: 16.9M (peak: 19.3M)
+        CPU: 105ms
+     CGroup: /system.slice/cups.service
+             ├─2923 /usr/sbin/cupsd -l
+             ├─2924 /usr/lib/cups/notifier/dbus dbus://
+             ├─2925 /usr/lib/cups/notifier/dbus dbus://
+             ├─2926 /usr/lib/cups/notifier/dbus dbus://
+             ├─2927 /usr/lib/cups/notifier/dbus dbus://
+             ├─2928 /usr/lib/cups/notifier/dbus dbus://
+             ├─2929 /usr/lib/cups/notifier/dbus dbus://
+             ├─2930 /usr/lib/cups/notifier/dbus dbus://
+             ├─2931 /usr/lib/cups/notifier/dbus dbus://
+             ├─2932 /usr/lib/cups/notifier/dbus dbus://
+             ├─2933 /usr/lib/cups/notifier/dbus dbus://
+             ├─2934 /usr/lib/cups/notifier/dbus dbus://
+             ├─2935 /usr/lib/cups/notifier/dbus dbus://
+             ├─2936 /usr/lib/cups/notifier/dbus dbus://
+             └─2937 /usr/lib/cups/notifier/dbus dbus://
+
+Dec 19 09:42:55 flyon21-PC systemd[1]: Starting cups.service - CUPS Scheduler...
+Dec 19 09:42:56 flyon21-PC systemd[1]: Started cups.service - CUPS Scheduler.
+
+================================================
+
+COMMAND: runlevel
+N 3
+
+================================================
+
+COMMAND: systemctl get-default
+multi-user.target
+
+================================================
+
+COMMAND: sudo systemctl set-default multi-user.target
+
+================================================
+
+COMMAND: sudo systemctl isolate default.target
+
+================================================
+
+COMMAND: runlevel
+N 3
+
+================================================
+
+COMMAND: systemctl list-units -t target --state=active
+  UNIT                  LOAD   ACTIVE SUB    DESCRIPTION
+  basic.target          loaded active active Basic System
+  cryptsetup.target     loaded active active Local Encrypted Volumes
+  getty.target          loaded active active Login Prompts
+  integritysetup.target loaded active active Local Integrity Protected Volumes
+  local-fs-pre.target   loaded active active Preparation for Local File Systems
+  local-fs.target       loaded active active Local File Systems
+  multi-user.target     loaded active active Multi-User System
+  network-online.target loaded active active Network is Online
+  nss-lookup.target     loaded active active Host and Network Name Lookups
+  paths.target          loaded active active Path Units
+  remote-fs.target      loaded active active Remote File Systems
+  slices.target         loaded active active Slice Units
+  sockets.target        loaded active active Socket Units
+  swap.target           loaded active active Swaps
+  sysinit.target        loaded active active System Initialization
+  time-set.target       loaded active active System Time Set
+  timers.target         loaded active active Timer Units
+  veritysetup.target    loaded active active Local Verity Protected Volumes
+
+Legend: LOAD   → Reflects whether the unit definition was properly loaded.
+        ACTIVE → The high-level unit activation state, i.e. generalization of SUB.
+        SUB    → The low-level unit activation state, values depend on unit type.
+
+18 loaded units listed.
+
+================================================
+
+COMMAND: systemctl list-units -t target --all
+  UNIT                       LOAD   ACTIVE   SUB    DESCRIPTION
+  basic.target               loaded active   active Basic System
+  cryptsetup-pre.target      loaded inactive dead   Local Encrypted Volumes (Pre)
+  cryptsetup.target          loaded active   active Local Encrypted Volumes
+  emergency.target           loaded inactive dead   Emergency Mode
+  final.target               loaded inactive dead   Late Shutdown Services
+  first-boot-complete.target loaded inactive dead   First Boot Complete
+  getty-pre.target           loaded inactive dead   Preparation for Logins
+  getty.target               loaded active   active Login Prompts
+  graphical.target           loaded inactive dead   Graphical Interface
+  initrd-fs.target           loaded inactive dead   Initrd File Systems
+  initrd-root-device.target  loaded inactive dead   Initrd Root Device
+  initrd-root-fs.target      loaded inactive dead   Initrd Root File System
+  initrd-switch-root.target  loaded inactive dead   Switch Root
+  initrd-usr-fs.target       loaded inactive dead   Initrd /usr File System
+  initrd.target              loaded inactive dead   Initrd Default Target
+  integritysetup.target      loaded active   active Local Integrity Protected Volumes
+  local-fs-pre.target        loaded active   active Preparation for Local File Systems
+  local-fs.target            loaded active   active Local File Systems
+  multi-user.target          loaded active   active Multi-User System
+  network-online.target      loaded active   active Network is Online
+  network-pre.target         loaded inactive dead   Preparation for Network
+  network.target             loaded inactive dead   Network
+  nss-lookup.target          loaded active   active Host and Network Name Lookups
+  nss-user-lookup.target     loaded inactive dead   User and Group Name Lookups
+  paths.target               loaded active   active Path Units
+  remote-cryptsetup.target   loaded inactive dead   Remote Encrypted Volumes
+  remote-fs-pre.target       loaded inactive dead   Preparation for Remote File Systems
+  remote-fs.target           loaded active   active Remote File Systems
+  remote-veritysetup.target  loaded inactive dead   Remote Verity Protected Volumes
+  rescue.target              loaded inactive dead   Rescue Mode
+  shutdown.target            loaded inactive dead   System Shutdown
+  slices.target              loaded active   active Slice Units
+  sockets.target             loaded active   active Socket Units
+  soft-reboot.target         loaded inactive dead   Reboot System Userspace
+  swap.target                loaded active   active Swaps
+  sysinit.target             loaded active   active System Initialization
+  time-set.target            loaded active   active System Time Set
+  time-sync.target           loaded inactive dead   System Time Synchronized
+  timers.target              loaded active   active Timer Units
+  umount.target              loaded inactive dead   Unmount All Filesystems
+  veritysetup-pre.target     loaded inactive dead   Local Verity Protected Volumes (Pre)
+  veritysetup.target         loaded active   active Local Verity Protected Volumes
+
+Legend: LOAD   → Reflects whether the unit definition was properly loaded.
+        ACTIVE → The high-level unit activation state, i.e. generalization of SUB.
+        SUB    → The low-level unit activation state, values depend on unit type.
+
+42 loaded units listed.
+To show all installed unit files use 'systemctl list-unit-files'.
+
+================================================
+
+COMMAND: sudo systemctl isolate basic.target
+Failed to start basic.target: Operation refused, unit may not be isolated.
+See system logs and 'systemctl status basic.target' for details.
+
+================================================
+
+COMMAND: systemctl status basic.target
+● basic.target - Basic System
+     Loaded: loaded (/usr/lib/systemd/system/basic.target; static)
+     Active: active since Fri 2025-12-19 09:21:23 EET; 21min ago
+       Docs: man:systemd.special(7)
+
+Dec 19 09:21:23 flyon21-PC systemd[1]: Reached target basic.target - Basic System.
+
+================================================
+
+COMMAND: systemctl cat basic.target
+# /usr/lib/systemd/system/basic.target
+#  SPDX-License-Identifier: LGPL-2.1-or-later
+#
+#  This file is part of systemd.
+#
+#  systemd is free software; you can redistribute it and/or modify it
+#  under the terms of the GNU Lesser General Public License as published by
+#  the Free Software Foundation; either version 2.1 of the License, or
+#  (at your option) any later version.
+
+[Unit]
+Description=Basic System
+Documentation=man:systemd.special(7)
+Requires=sysinit.target
+Wants=sockets.target timers.target paths.target slices.target
+After=sysinit.target sockets.target paths.target slices.target tmp.mount
+
+# We support /var, /tmp, /var/tmp, being on NFS, but we don't pull in
+# remote-fs.target by default, hence pull them in explicitly here. Note that we
+# require /var and /var/tmp, but only add a Wants= type dependency on /tmp, as
+# we support that unit being masked, and this should not be considered an error.
+RequiresMountsFor=/var /var/tmp
+Wants=tmp.mount
+
+================================================
+
+COMMAND: systemctl cat multi-user.target
+# /usr/lib/systemd/system/multi-user.target
+#  SPDX-License-Identifier: LGPL-2.1-or-later
+#
+#  This file is part of systemd.
+#
+#  systemd is free software; you can redistribute it and/or modify it
+#  under the terms of the GNU Lesser General Public License as published by
+#  the Free Software Foundation; either version 2.1 of the License, or
+#  (at your option) any later version.
+
+[Unit]
+Description=Multi-User System
+Documentation=man:systemd.special(7)
+Requires=basic.target
+Conflicts=rescue.service rescue.target
+After=basic.target rescue.service rescue.target
+AllowIsolate=yes
+
+================================================
+
+COMMAND: ls /sbin/halt /sbin/poweroff /sbin/reboot /sbin/shutdown
+/sbin/halt
+/sbin/poweroff
+/sbin/reboot
+/sbin/shutdown
+
+================================================
+
+COMMAND: ls -l /sbin/halt /sbin/poweroff /sbin/reboot /sbin/shutdown
+lrwxrwxrwx 1 root root 16 Apr 19  2024 /sbin/halt -> ../bin/systemctl
+lrwxrwxrwx 1 root root 16 Apr 19  2024 /sbin/poweroff -> ../bin/systemctl
+lrwxrwxrwx 1 root root 16 Apr 19  2024 /sbin/reboot -> ../bin/systemctl
+lrwxrwxrwx 1 root root 16 Apr 19  2024 /sbin/shutdown -> ../bin/systemctl
+
+================================================
+
+COMMAND: sh -c ls -l /lib/systemd/system | wc -l
+295
+
+================================================
+
+COMMAND: sh -c ls -l /run/systemd/system | wc -l
+3
+
+================================================
+
+COMMAND: sh -c ls -l /etc/systemd/system | wc -l
+18
+
+================================================
+
+COMMAND: ls -l /etc/systemd/system
+total 48
+-rw-r--r-- 1 root root  164 Dec 19 09:40 blahwoof.service
+-rw-r--r-- 1 root root  143 Dec 19 09:40 blahwoof.timer
+lrwxrwxrwx 1 root root   44 Dec 18 22:43 dbus-org.freedesktop.Avahi.service -> /usr/lib/systemd/system/avahi-daemon.service
+lrwxrwxrwx 1 root root   48 Dec 18 22:41 dbus-org.freedesktop.resolve1.service -> /usr/lib/systemd/system/systemd-resolved.service
+lrwxrwxrwx 1 root root   49 Dec 18 22:41 dbus-org.freedesktop.timesync1.service -> /usr/lib/systemd/system/systemd-timesyncd.service
+lrwxrwxrwx 1 root root   41 Dec 18 23:07 default.target -> /usr/lib/systemd/system/multi-user.target
+drwxr-xr-x 2 root root 4096 Dec 18 22:41 getty.target.wants
+drwxr-xr-x 2 root root 4096 Dec 18 22:43 multi-user.target.wants
+drwxr-xr-x 2 root root 4096 Dec 18 22:43 printer.target.wants
+drwxr-xr-x 2 root root 4096 Dec 18 23:07 sockets.target.wants
+drwxr-xr-x 2 root root 4096 Dec 18 23:07 ssh.service.requires
+-rw-r--r-- 1 root root  223 Dec 19 09:40 stress1.service
+-rw-r--r-- 1 root root  224 Dec 19 09:40 stress2.service
+-rw-r--r-- 1 root root  224 Dec 19 09:40 stress3.service
+drwxr-xr-x 2 root root 4096 Dec 18 22:41 sysinit.target.wants
+lrwxrwxrwx 1 root root   39 Dec 18 22:41 syslog.service -> /usr/lib/systemd/system/rsyslog.service
+drwxr-xr-x 2 root root 4096 Dec 18 23:33 timers.target.wants
+
+================================================
+
+
+================== END TASK: last_activity ==================
+

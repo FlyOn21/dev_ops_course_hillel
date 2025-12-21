@@ -1,0 +1,258 @@
+================== START TASK: systemd_timers ==================
+
+COMMAND: systemctl list-timers
+NEXT                             LEFT LAST                          PASSED UNIT                         ACTIVATES
+Fri 2025-12-19 09:43:00 EET        3s Fri 2025-12-19 09:42:55 EET   1s ago blahwoof.timer               blahwoof.service
+Fri 2025-12-19 22:22:56 EET       12h Fri 2025-12-19 08:15:54 EET        - motd-news.timer              motd-news.service
+Fri 2025-12-19 22:38:17 EET       12h Fri 2025-12-19 08:17:05 EET        - apt-daily.timer              apt-daily.service
+Sat 2025-12-20 00:00:00 EET       14h Fri 2025-12-19 07:46:11 EET        - dpkg-db-backup.timer         dpkg-db-backup.service
+Sat 2025-12-20 00:00:00 EET       14h Fri 2025-12-19 07:46:11 EET        - logrotate.timer              logrotate.service
+Sat 2025-12-20 06:30:24 EET       20h Fri 2025-12-19 07:46:11 EET        - apt-daily-upgrade.timer      apt-daily-upgrade.service
+Sat 2025-12-20 09:36:24 EET       23h Fri 2025-12-19 09:36:24 EET 6min ago systemd-tmpfiles-clean.timer systemd-tmpfiles-clean.service
+Sun 2025-12-21 03:10:37 EET 1 day 17h Thu 2025-12-18 22:43:08 EET        - e2scrub_all.timer            e2scrub_all.service
+
+8 timers listed.
+Pass --all to see loaded but inactive timers, too.
+
+================================================
+
+COMMAND: systemctl cat fstrim.timer
+# /usr/lib/systemd/system/fstrim.timer
+[Unit]
+Description=Discard unused filesystem blocks once a week
+Documentation=man:fstrim
+ConditionVirtualization=!container
+ConditionPathExists=!/etc/initrd-release
+
+[Timer]
+OnCalendar=weekly
+AccuracySec=1h
+Persistent=true
+RandomizedDelaySec=100min
+
+[Install]
+WantedBy=timers.target
+
+================================================
+
+COMMAND: systemctl cat fstrim.service
+# /usr/lib/systemd/system/fstrim.service
+[Unit]
+Description=Discard unused blocks on filesystems from /etc/fstab
+Documentation=man:fstrim(8)
+ConditionVirtualization=!container
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/fstrim --listed-in /etc/fstab:/proc/self/mountinfo --verbose --quiet-unsupported
+PrivateDevices=no
+PrivateNetwork=yes
+PrivateUsers=no
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+MemoryDenyWriteExecute=yes
+SystemCallFilter=@default @file-system @basic-io @system-service
+
+================================================
+
+COMMAND: systemd-analyze calendar hourly
+  Original form: hourly
+Normalized form: *-*-* *:00:00
+    Next elapse: Fri 2025-12-19 10:00:00 EET
+       (in UTC): Fri 2025-12-19 08:00:00 UTC
+       From now: 17min left
+
+================================================
+
+COMMAND: systemd-analyze calendar daily
+  Original form: daily
+Normalized form: *-*-* 00:00:00
+    Next elapse: Sat 2025-12-20 00:00:00 EET
+       (in UTC): Fri 2025-12-19 22:00:00 UTC
+       From now: 14h left
+
+================================================
+
+COMMAND: systemd-analyze calendar weekly
+  Original form: weekly
+Normalized form: Mon *-*-* 00:00:00
+    Next elapse: Mon 2025-12-22 00:00:00 EET
+       (in UTC): Sun 2025-12-21 22:00:00 UTC
+       From now: 2 days left
+
+================================================
+
+COMMAND: systemd-analyze calendar monthly
+  Original form: monthly
+Normalized form: *-*-01 00:00:00
+    Next elapse: Thu 2026-01-01 00:00:00 EET
+       (in UTC): Wed 2025-12-31 22:00:00 UTC
+       From now: 1 week 5 days left
+
+================================================
+
+COMMAND: systemd-analyze calendar *-*-* 09..17:00/5
+  Original form: *-*-* 09..17:00/5
+Normalized form: *-*-* 09..17:00/5:00
+    Next elapse: Fri 2025-12-19 09:45:00 EET
+       (in UTC): Fri 2025-12-19 07:45:00 UTC
+       From now: 2min 3s left
+
+================================================
+
+COMMAND: systemd-analyze calendar Mon..Fri *-*-* 09..17:00/5
+  Original form: Mon..Fri *-*-* 09..17:00/5
+Normalized form: Mon..Fri *-*-* 09..17:00/5:00
+    Next elapse: Fri 2025-12-19 09:45:00 EET
+       (in UTC): Fri 2025-12-19 07:45:00 UTC
+       From now: 2min 3s left
+
+================================================
+
+COMMAND: sh -c cat > /home/admin/journo.sh << "EOF"
+#!/bin/sh
+echo "Timer fired at $(date)" | systemd-cat -t blahwoof
+EOF
+
+================================================
+
+COMMAND: chmod a+x /home/admin/journo.sh
+
+================================================
+
+COMMAND: sudo sh -c cat > /etc/systemd/system/blahwoof.timer << "EOF"
+[Unit]
+Description=Run the blahwoof service every 5 seconds
+
+[Timer]
+OnCalendar=*-*-* *:*:0/5
+AccuracySec=1s
+
+[Install]
+WantedBy=timers.target
+EOF
+
+================================================
+
+COMMAND: sudo sh -c cat > /etc/systemd/system/blahwoof.service << "EOF"
+[Unit]
+Description=Write a quick entry to the systemd journal
+
+[Service]
+Type=oneshot
+User=admin
+ExecStart=/home/admin/journo.sh
+
+[Install]
+WantedBy=blahwoof.timer
+EOF
+
+================================================
+
+COMMAND: sudo systemctl daemon-reload
+
+================================================
+
+COMMAND: systemctl cat blahwoof.timer
+# /etc/systemd/system/blahwoof.timer
+[Unit]
+Description=Run the blahwoof service every 5 seconds
+
+[Timer]
+OnCalendar=*-*-* *:*:0/5
+AccuracySec=1s
+
+[Install]
+WantedBy=timers.target
+
+================================================
+
+COMMAND: systemctl cat blahwoof.service
+# /etc/systemd/system/blahwoof.service
+[Unit]
+Description=Write a quick entry to the systemd journal
+
+[Service]
+Type=oneshot
+User=admin
+ExecStart=/home/admin/journo.sh
+
+[Install]
+WantedBy=blahwoof.timer
+
+================================================
+
+COMMAND: systemctl list-timers
+NEXT                             LEFT LAST                          PASSED UNIT                         ACTIVATES
+Fri 2025-12-19 09:43:00 EET        3s Fri 2025-12-19 09:42:55 EET   1s ago blahwoof.timer               blahwoof.service
+Fri 2025-12-19 13:38:58 EET  3h 56min Fri 2025-12-19 08:15:54 EET        - motd-news.timer              motd-news.service
+Fri 2025-12-19 20:51:20 EET       11h Fri 2025-12-19 08:17:05 EET        - apt-daily.timer              apt-daily.service
+Sat 2025-12-20 00:00:00 EET       14h Fri 2025-12-19 07:46:11 EET        - dpkg-db-backup.timer         dpkg-db-backup.service
+Sat 2025-12-20 00:00:00 EET       14h Fri 2025-12-19 07:46:11 EET        - logrotate.timer              logrotate.service
+Sat 2025-12-20 06:27:53 EET       20h Fri 2025-12-19 07:46:11 EET        - apt-daily-upgrade.timer      apt-daily-upgrade.service
+Sat 2025-12-20 09:36:24 EET       23h Fri 2025-12-19 09:36:24 EET 6min ago systemd-tmpfiles-clean.timer systemd-tmpfiles-clean.service
+Sun 2025-12-21 03:10:07 EET 1 day 17h Thu 2025-12-18 22:43:08 EET        - e2scrub_all.timer            e2scrub_all.service
+
+8 timers listed.
+Pass --all to see loaded but inactive timers, too.
+
+================================================
+
+COMMAND: sudo systemctl enable blahwoof.timer
+
+================================================
+
+COMMAND: sudo systemctl start blahwoof.timer
+
+================================================
+
+COMMAND: systemctl status blahwoof.timer
+● blahwoof.timer - Run the blahwoof service every 5 seconds
+     Loaded: loaded (/etc/systemd/system/blahwoof.timer; enabled; preset: enabled)
+     Active: active (waiting) since Fri 2025-12-19 09:21:23 EET; 21min ago
+    Trigger: Fri 2025-12-19 09:43:00 EET; 3s left
+   Triggers: ● blahwoof.service
+
+Dec 19 09:21:23 flyon21-PC systemd[1]: Started blahwoof.timer - Run the blahwoof service every 5 seconds.
+
+================================================
+
+COMMAND: sleep 10
+
+================================================
+
+COMMAND: sudo journalctl -t blahwoof -n 10 --no-pager
+Dec 19 09:42:20 flyon21-PC blahwoof[2784]: Timer fired at Fri Dec 19 09:42:20 EET 2025
+Dec 19 09:42:25 flyon21-PC blahwoof[2790]: Timer fired at Fri Dec 19 09:42:25 EET 2025
+Dec 19 09:42:30 flyon21-PC blahwoof[2796]: Timer fired at Fri Dec 19 09:42:30 EET 2025
+Dec 19 09:42:35 flyon21-PC blahwoof[2802]: Timer fired at Fri Dec 19 09:42:35 EET 2025
+Dec 19 09:42:40 flyon21-PC blahwoof[2808]: Timer fired at Fri Dec 19 09:42:40 EET 2025
+Dec 19 09:42:45 flyon21-PC blahwoof[2814]: Timer fired at Fri Dec 19 09:42:45 EET 2025
+Dec 19 09:42:50 flyon21-PC blahwoof[2820]: Timer fired at Fri Dec 19 09:42:50 EET 2025
+Dec 19 09:42:55 flyon21-PC blahwoof[2833]: Timer fired at Fri Dec 19 09:42:55 EET 2025
+Dec 19 09:43:00 flyon21-PC blahwoof[3106]: Timer fired at Fri Dec 19 09:43:00 EET 2025
+Dec 19 09:43:05 flyon21-PC blahwoof[3112]: Timer fired at Fri Dec 19 09:43:05 EET 2025
+
+================================================
+
+COMMAND: systemctl list-timers --all
+NEXT                             LEFT LAST                          PASSED UNIT                         ACTIVATES
+Fri 2025-12-19 09:43:10 EET        3s Fri 2025-12-19 09:43:05 EET   1s ago blahwoof.timer               blahwoof.service
+Fri 2025-12-19 12:33:05 EET  2h 49min Fri 2025-12-19 08:15:54 EET        - motd-news.timer              motd-news.service
+Fri 2025-12-19 20:00:44 EET       10h Fri 2025-12-19 08:17:05 EET        - apt-daily.timer              apt-daily.service
+Sat 2025-12-20 00:00:00 EET       14h Fri 2025-12-19 07:46:11 EET        - dpkg-db-backup.timer         dpkg-db-backup.service
+Sat 2025-12-20 00:00:00 EET       14h Fri 2025-12-19 07:46:11 EET        - logrotate.timer              logrotate.service
+Sat 2025-12-20 06:19:22 EET       20h Fri 2025-12-19 07:46:11 EET        - apt-daily-upgrade.timer      apt-daily-upgrade.service
+Sat 2025-12-20 09:36:24 EET       23h Fri 2025-12-19 09:36:24 EET 6min ago systemd-tmpfiles-clean.timer systemd-tmpfiles-clean.service
+Sun 2025-12-21 03:10:25 EET 1 day 17h Thu 2025-12-18 22:43:08 EET        - e2scrub_all.timer            e2scrub_all.service
+-                                   - -                                  - fstrim.timer                 fstrim.service
+-                                   - -                                  - ua-timer.timer               ua-timer.service
+
+10 timers listed.
+
+================================================
+
+
+================== END TASK: systemd_timers ==================
+

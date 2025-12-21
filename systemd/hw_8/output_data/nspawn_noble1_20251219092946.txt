@@ -1,0 +1,104 @@
+=== Container Management Log for noble1 ===
+
+--- machinectl status ---
+noble1(c3327e044a274ffa83a2cb1079a1535a)
+	   Since: Fri 2025-12-19 09:21:23 EET; 8min ago
+	  Leader: 225398 (systemd)
+	 Service: systemd-nspawn; class container
+	    Root: /var/lib/machines/noble1
+	      OS: Ubuntu 24.04 LTS
+	    Unit: machine-noble1.scope
+		  └─payload
+		    ├─init.scope
+		    │ └─225398 /usr/lib/systemd/systemd
+		    ├─system.slice
+		    │ ├─avahi-daemon.service
+		    │ │ ├─225493 "avahi-daemon: running [flyon21-PC.local]"
+		    │ │ └─225500 "avahi-daemon: chroot helper"
+		    │ ├─console-getty.service
+		    │ │ └─225516 /sbin/agetty -o "-p -- \\u" --noclear --keep-baud - 115200,38400,9600 vt220
+		    │ ├─cron.service
+		    │ │ └─225494 /usr/sbin/cron -f -P
+		    │ ├─cups-browsed.service
+		    │ │ └─225517 /usr/sbin/cups-browsed
+		    │ ├─cups.service
+		    │ │ ├─225495 /usr/sbin/cupsd -l
+		    │ │ ├─225501 /usr/lib/cups/notifier/dbus dbus://
+		    │ │ ├─225502 /usr/lib/cups/notifier/dbus dbus://
+		    │ │ ├─225503 /usr/lib/cups/notifier/dbus dbus://
+		    │ │ ├─225504 /usr/lib/cups/notifier/dbus dbus://
+		    │ │ ├─225505 /usr/lib/cups/notifier/dbus dbus://
+		    │ │ ├─225506 /usr/lib/cups/notifier/dbus dbus://
+		    │ │ ├─225507 /usr/lib/cups/notifier/dbus dbus://
+		    │ │ ├─225508 /usr/lib/cups/notifier/dbus dbus://
+		    │ │ ├─225509 /usr/lib/cups/notifier/dbus dbus://
+		    │ │ ├─225510 /usr/lib/cups/notifier/dbus dbus://
+		    │ │ ├─225511 /usr/lib/cups/notifier/dbus dbus://
+		    │ │ ├─225512 /usr/lib/cups/notifier/dbus dbus://
+		    │ │ ├─225513 /usr/lib/cups/notifier/dbus dbus://
+		    │ │ └─225515 /usr/lib/cups/notifier/dbus dbus://
+		    │ ├─dbus.service
+		    │ │ └─225496 @dbus-daemon --system --address=systemd: --nofork --nopidfile --systemd-activation --syslog-only
+		    │ ├─rsyslog.service
+		    │ │ └─225521 /usr/sbin/rsyslogd -n -iNONE
+		    │ ├─systemd-journald.service
+		    │ │ └─225426 /usr/lib/systemd/systemd-journald
+		    │ ├─systemd-logind.service
+		    │ │ └─225488 /usr/lib/systemd/systemd-logind
+		    │ ├─systemd-resolved.service
+		    │ │ └─225474 /usr/lib/systemd/systemd-resolved
+		    │ └─unattended-upgrades.service
+		    │   └─225519 /usr/bin/python3 /usr/share/unattended-upgrades/unattended-upgrade-shutdown --wait-for-signal
+		    └─user.slice
+		      └─user-1000.slice
+		        ├─session-69.scope
+		        │ ├─227858 /bin/login -p --
+		        │ └─227993 -bash
+		        └─user@1000.service
+		          └─init.scope
+		            ├─227980 /usr/lib/systemd/systemd --user
+		            └─227982 "(sd-pam)"
+
+гру 19 09:21:23 flyon21-PC systemd[1]: Started machine-noble1.scope - Container noble1.
+
+--- systemd-nspawn service status ---
+● noble1.service - Ubuntu Container
+     Loaded: loaded (/etc/systemd/system/noble1.service; disabled; preset: enabled)
+     Active: active (running) since Fri 2025-12-19 09:21:23 EET; 8min ago
+   Main PID: 225396 (systemd-nspawn)
+      Tasks: 1 (limit: 38082)
+     Memory: 1.3M (peak: 2.4M)
+        CPU: 11ms
+     CGroup: /system.slice/noble1.service
+             └─225396 /usr/bin/systemd-nspawn --machine=noble1 --directory=/var/lib/machines/noble1/ --bind=/home/flyon21/PycharmProjects/dev_ops_course_hillel/systemd/hw_8:/mnt/hw_8 --network-ipvlan=wlp0s20f3 -b
+
+гру 19 09:21:24 flyon21-PC systemd-nspawn[225396]: [  OK  ] Started cups-browsed.service - Make…e CUPS printers available locally.
+гру 19 09:21:24 flyon21-PC systemd-nspawn[225396]: [  OK  ] Started systemd-logind.service - User Login Management.
+гру 19 09:21:24 flyon21-PC systemd-nspawn[225396]: [  OK  ] Started unattended-upgrades.service - Unattended Upgrades Shutdown.
+гру 19 09:21:24 flyon21-PC systemd-nspawn[225396]: [  OK  ] Started rsyslog.service - System Logging Service.
+гру 19 09:21:24 flyon21-PC systemd-nspawn[225396]: [  OK  ] Reached target multi-user.target - Multi-User System.
+гру 19 09:21:24 flyon21-PC systemd-nspawn[225396]:          Starting systemd-update-utmp-runlev… Record Runlevel Change in UTMP...
+гру 19 09:21:24 flyon21-PC systemd-nspawn[225396]: [  OK  ] Finished systemd-update-utmp-runlev… - Record Runlevel Change in UTMP.
+гру 19 09:21:25 flyon21-PC systemd-nspawn[225396]: 
+гру 19 09:21:25 flyon21-PC systemd-nspawn[225396]: Ubuntu 24.04 LTS flyon21-PC pts/0
+гру 19 09:21:25 flyon21-PC systemd-nspawn[225396]: 
+
+--- systemctl cat service ---
+# /etc/systemd/system/noble1.service
+[Unit]
+Description=Ubuntu Container
+
+[Service]
+LimitNOFILE=100000
+ExecStart=/home/flyon21/PycharmProjects/dev_ops_course_hillel/systemd/hw_8/nspawn_ubuntu_mashine.sh --only-spawn
+Restart=always
+
+[Install]
+Also=dbus.service
+WantedBy=default.target
+
+--- machinectl list ---
+MACHINE CLASS     SERVICE        OS     VERSION ADDRESSES
+noble1  container systemd-nspawn ubuntu 24.04   -
+
+1 machines listed.

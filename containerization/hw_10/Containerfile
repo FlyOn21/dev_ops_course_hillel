@@ -1,0 +1,17 @@
+FROM nginx:stable-alpine-slim
+
+ARG PORT
+ENV PORT=${PORT}
+
+WORKDIR /app
+COPY systemd/hw_7/nginx_conf.template systemd/hw_7/index_html.template ./
+
+RUN apk add --no-cache gettext
+
+RUN mkdir -p /var/log/nginx_${PORT} /var/www/html \
+    && envsubst '${PORT}' < /app/nginx_conf.template > /etc/nginx/nginx.conf \
+    && envsubst '${PORT}' < /app/index_html.template > /var/www/html/index_${PORT}.html
+
+EXPOSE ${PORT}
+
+CMD ["nginx", "-g", "daemon off;"]

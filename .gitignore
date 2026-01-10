@@ -245,3 +245,8 @@ cython_debug/
 
 .idea
 .idea/*
+
+#ignor cdk
+.cdk.out/
+/AWS/cdk.out
+/AWS/cdk.out/*

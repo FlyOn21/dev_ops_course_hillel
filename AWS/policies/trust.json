@@ -4,7 +4,7 @@
     {
       "Effect": "Allow",
       "Principal": {
-        "AWS": "arn:aws:iam::025066240566:user/flyon21"
+        "AWS": "arn:aws:iam::<YOUR_ACCAUNT_IDENTIFIER>:user/flyon21"
       },
       "Action": "sts:AssumeRole",
       "Condition": {}

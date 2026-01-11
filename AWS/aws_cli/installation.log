@@ -69,13 +69,13 @@ Adding SSH ingress rule for IP: 94.131.197.224
         {
             "SecurityGroupRuleId": "sgr-0df843fa1a343405a",
             "GroupId": "sg-01792dd14dfccfde9",
-            "GroupOwnerId": "025066240566",
+            "GroupOwnerId": "<YOUR_ACCAUNT_IDENTIFIER>",
             "IsEgress": false,
             "IpProtocol": "tcp",
             "FromPort": 22,
             "ToPort": 22,
             "CidrIpv4": "94.131.197.224/32",
-            "SecurityGroupRuleArn": "arn:aws:ec2:eu-central-1:025066240566:security-group-rule/sgr-0df843fa1a343405a"
+            "SecurityGroupRuleArn": "arn:aws:ec2:eu-central-1:<YOUR_ACCAUNT_IDENTIFIER>:security-group-rule/sgr-0df843fa1a343405a"
         }
     ]
 }
@@ -86,16 +86,16 @@ Private Security Group ID: sg-022b9c6678600264c
         {
             "SecurityGroupRuleId": "sgr-0ff43c21a8e9dd094",
             "GroupId": "sg-022b9c6678600264c",
-            "GroupOwnerId": "025066240566",
+            "GroupOwnerId": "<YOUR_ACCAUNT_IDENTIFIER>",
             "IsEgress": false,
             "IpProtocol": "tcp",
             "FromPort": 22,
             "ToPort": 22,
             "ReferencedGroupInfo": {
                 "GroupId": "sg-01792dd14dfccfde9",
-                "UserId": "025066240566"
+                "UserId": "<YOUR_ACCAUNT_IDENTIFIER>"
             },
-            "SecurityGroupRuleArn": "arn:aws:ec2:eu-central-1:025066240566:security-group-rule/sgr-0ff43c21a8e9dd094"
+            "SecurityGroupRuleArn": "arn:aws:ec2:eu-central-1:<YOUR_ACCAUNT_IDENTIFIER>:security-group-rule/sgr-0ff43c21a8e9dd094"
         }
     ]
 }

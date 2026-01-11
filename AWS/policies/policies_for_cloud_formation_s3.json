@@ -51,7 +51,7 @@
         "ssm:DeleteParameter",
         "ssm:AddTagsToResource"
       ],
-      "Resource": "arn:aws:ssm:*:025066240566:parameter/cdk-bootstrap/*"
+      "Resource": "arn:aws:ssm:*:<YOUR_ACCAUNT_IDENTIFIER>:parameter/cdk-bootstrap/*"
     },
     {
       "Sid": "IAMRolePermissions",
@@ -68,13 +68,13 @@
         "iam:TagRole",
         "iam:UntagRole"
       ],
-      "Resource": "arn:aws:iam::025066240566:role/cdk-*"
+      "Resource": "arn:aws:iam::<YOUR_ACCAUNT_IDENTIFIER>:role/cdk-*"
     },
     {
       "Sid": "IAMPassRolePermissions",
       "Effect": "Allow",
       "Action": "iam:PassRole",
-      "Resource": "arn:aws:iam::025066240566:role/cdk-*",
+      "Resource": "arn:aws:iam::<YOUR_ACCAUNT_IDENTIFIER>:role/cdk-*",
       "Condition": {
         "StringEquals": {
           "iam:PassedToService": "cloudformation.amazonaws.com"
@@ -86,7 +86,7 @@
       "Effect": "Allow",
       "Action": "sts:AssumeRole",
       "Resource": [
-        "arn:aws:iam::025066240566:role/cdk-*"
+        "arn:aws:iam::<YOUR_ACCAUNT_IDENTIFIER>:role/cdk-*"
       ]
     },
     {

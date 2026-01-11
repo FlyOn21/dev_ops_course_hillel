@@ -129,6 +129,8 @@ cover/
 
 # Django stuff:
 *.log
+!installation.log
+!uninstall.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
@@ -245,3 +247,8 @@ cython_debug/
 
 .idea
 .idea/*
+
+#ignor cdk
+.cdk.out/
+/AWS/cdk.out
+/AWS/cdk.out/*

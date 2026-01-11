@@ -1,0 +1,94 @@
+==========================================
+AWS Infrastructure Cleanup Script
+==========================================
+AWS Profile: flyon21
+WARNING: This will delete all Flyon21 infrastructure!
+==========================================
+Are you sure you want to continue? (yes/no): yes
+
+Starting cleanup...
+./aws_cli_hw12_uninstall.sh: 33: [: vpc-0566d293bb71b1cec: unexpected operator
+Found VPC: vpc-0566d293bb71b1cec
+[1/12] Terminating EC2 Instances...
+Terminating instances: i-0c41cbe5a9dfb5b87      i-00110b7dc75a13790
+{
+    "TerminatingInstances": [
+        {
+            "InstanceId": "i-00110b7dc75a13790",
+            "CurrentState": {
+                "Code": 32,
+                "Name": "shutting-down"
+            },
+            "PreviousState": {
+                "Code": 16,
+                "Name": "running"
+            }
+        },
+        {
+            "InstanceId": "i-0c41cbe5a9dfb5b87",
+            "CurrentState": {
+                "Code": 32,
+                "Name": "shutting-down"
+            },
+            "PreviousState": {
+                "Code": 16,
+                "Name": "running"
+            }
+        }
+    ]
+}
+Waiting for instances to terminate...
+Instances terminated.
+[2/12] Releasing Elastic IPs...
+Releasing EIP: eipalloc-089cb23b69c7a09fc
+Releasing EIP: eipalloc-05ed41c5757029eae
+Releasing EIP: eipalloc-0fcdc8afa37250510
+
+An error occurred (AuthFailure) when calling the ReleaseAddress operation: You do not have permission to access the specified resource.
+Failed to release eipalloc-0fcdc8afa37250510 (may already be released)
+[3/12] Deleting NAT Gateways...
+Deleting NAT Gateway: nat-0a2dc38ddb5ddd1fe
+{
+    "NatGatewayId": "nat-0a2dc38ddb5ddd1fe"
+}
+Waiting for NAT Gateways to be deleted...
+[4/12] Deleting Route Table Associations...
+Disassociating route table association: rtbassoc-09cc0f3244ffa08b3
+Disassociating route table association: rtbassoc-0ebefb048e886b5eb
+[5/12] Detaching and Deleting Internet Gateway...
+Detaching Internet Gateway: igw-0d86c35657eeff79e
+Deleting Internet Gateway: igw-0d86c35657eeff79e
+[6/12] Deleting Route Tables...
+Deleting Route Table: rtb-0010dc33fd8cf8f56
+Deleting Route Table: rtb-07a4a4de1f740d030
+[7/12] Deleting Security Groups...
+Deleting Security Group: sg-022b9c6678600264c
+{
+    "Return": true,
+    "GroupId": "sg-022b9c6678600264c"
+}
+Deleting Security Group: sg-01792dd14dfccfde9
+{
+    "Return": true,
+    "GroupId": "sg-01792dd14dfccfde9"
+}
+Security group sg-022b9c6678600264c already deleted or still has dependencies
+Security group sg-01792dd14dfccfde9 already deleted or still has dependencies
+[8/12] Deleting Subnets...
+Deleting Subnet: subnet-0d9872addfb2de55d
+Deleting Subnet: subnet-0ae8cc16328ac6687
+[9/12] Deleting VPC...
+VPC deleted: vpc-0566d293bb71b1cec
+[10/12] Deleting Key Pair...
+{
+    "Return": true,
+    "KeyPairId": "key-0cd129466e43ee876"
+}
+Key pair deleted: Flyon21-KeyPair
+[11/12] Cleaning up local key file...
+No local key file found.
+[12/12] Cleanup complete!
+
+==========================================
+All Flyon21 infrastructure has been deleted.
+==========================================

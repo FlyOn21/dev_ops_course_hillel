@@ -10,7 +10,7 @@ class EC2Stack(Stack):
                  allowed_ssh_ip: str = None, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
         #################VPC CREATION######################
-        # Create VPC without default subnets
+        # Create VPC
         vpc = ec2.Vpc(
             self,
             "VPCFlyon21HW12",
@@ -22,7 +22,7 @@ class EC2Stack(Stack):
             subnet_configuration=[]
         )
 
-        # Create Public Subnet
+        #Public Subnet
         public_subnet = ec2.Subnet(
             self,
             "PublicSubnetFlyon21HW12",
@@ -32,7 +32,7 @@ class EC2Stack(Stack):
             map_public_ip_on_launch=True
         )
 
-        # Create Private Subnet
+        #Private Subnet
         private_subnet = ec2.Subnet(
             self,
             "PrivateSubnetFlyon21HW12",
@@ -41,14 +41,14 @@ class EC2Stack(Stack):
             cidr_block="192.168.1.0/24"
         )
 
-        # Create Internet Gateway
+        # Create IGW
         internet_gateway = ec2.CfnInternetGateway(
             self,
             "InternetGatewayFlyon21HW12",
             tags=[{"key": "name", "value": "Flyon21-IGW"}]
         )
 
-        # Attach Internet Gateway to VPC
+        # Attach IGW to VPC
         igw_attachment = ec2.CfnVPCGatewayAttachment(
             self,
             "IGWAttachmentFlyon21HW12",
@@ -57,7 +57,7 @@ class EC2Stack(Stack):
         )
         igw_attachment.add_dependency(internet_gateway)
 
-        # Create Elastic IP for NAT Gateway
+        # Create ElasticIP for NAT
         elastic_ip = ec2.CfnEIP(
             self,
             "NATGatewayEIPFlyon21HW12",
@@ -65,7 +65,7 @@ class EC2Stack(Stack):
             tags=[{"key": "name", "value": "Flyon21-NAT-EIP"}]
         )
 
-        # Create NAT Gateway in Public Subnet
+        # Create NAT in Public Subnet
         nat_gateway = ec2.CfnNatGateway(
             self,
             "NATGatewayFlyon21HW12",
@@ -75,7 +75,7 @@ class EC2Stack(Stack):
         )
         nat_gateway.add_dependency(elastic_ip)
 
-        # Create Route Table for Public Subnet
+        #Route Table for Public Subnet
         public_route_table = ec2.CfnRouteTable(
             self,
             "PublicRouteTableFlyon21HW12",
@@ -83,7 +83,7 @@ class EC2Stack(Stack):
             tags=[{"key": "name", "value": "Flyon21-Public-RT"}]
         )
 
-        # Add route to Internet Gateway in Public Route Table
+        # Add route to IGW in Public Route Table
         public_route = ec2.CfnRoute(
             self,
             "PublicRouteFlyon21HW12",
@@ -111,7 +111,7 @@ class EC2Stack(Stack):
             tags=[{"key": "name", "value": "Flyon21-Private-RT"}]
         )
 
-        # Add route to NAT Gateway in Private Route Table
+        # Add route to NAT in Private Route Table
         private_route= ec2.CfnRoute(
             self,
             "PrivateRouteFlyon21HW12",
@@ -145,7 +145,7 @@ class EC2Stack(Stack):
         )
 
         #################SECURITY GROUPS######################
-        # Security Group for Public EC2 Instance
+        # Security Group for Public EC2
         public_security_group = ec2.SecurityGroup(
             self,
             "PublicSecurityGroupFlyon21HW12",
@@ -155,7 +155,7 @@ class EC2Stack(Stack):
             allow_all_outbound=True
         )
 
-        # Add SSH ingress rule from your IP address
+        # Add SSH ingress rule
         if allowed_ssh_ip:
             public_security_group.add_ingress_rule(
                 peer=ec2.Peer.ipv4(f"{allowed_ssh_ip}/32"),
@@ -169,17 +169,17 @@ class EC2Stack(Stack):
                 description="Allow SSH from anywhere. !!!CHANGE THIS!!!"
             )
 
-        # Security Group for Private EC2 Instance
+        # Security Group for Private EC2
         private_security_group = ec2.SecurityGroup(
             self,
             "PrivateSecurityGroupFlyon21HW12",
             vpc=vpc,
             security_group_name="Flyon21-Private-SG",
             description="Security group for private EC2 instance - allows SSH from public subnet only",
-            allow_all_outbound=True # Allow outbound traffic
+            allow_all_outbound=True #outbound traffic
         )
 
-        # Add SSH ingress rule from Public Security Group
+        # Add SSH ingress rule from Public SG
         private_security_group.add_ingress_rule(
             peer=ec2.Peer.security_group_id(public_security_group.security_group_id),
             connection=ec2.Port.tcp(22),
@@ -187,7 +187,7 @@ class EC2Stack(Stack):
         )
 
         #################EC2 INSTANCES######################
-        # Get the latest Amazon Linux AMI
+        #Latest Amazon Linux AMI
         amzn_linux = ec2.MachineImage.latest_amazon_linux2(
             kernel=ec2.AmazonLinux2Kernel.KERNEL_5_10,
             edition=ec2.AmazonLinuxEdition.STANDARD,
@@ -196,7 +196,7 @@ class EC2Stack(Stack):
             cpu_type=ec2.AmazonLinuxCpuType.X86_64 # or ARM_64
         )
 
-        # Create EC2 Instance in Public Subnet
+        #EC2 Instance in Public Subnet
         public_instance = ec2.Instance(
             self,
             "PublicEC2InstanceFlyon21HW12",
@@ -210,7 +210,7 @@ class EC2Stack(Stack):
             private_ip_address="192.168.0.4"
         )
 
-        # Create Elastic IP for Public Instance for SSH Access
+        #ElasticIP for Public Instance for SSH
         public_eip = ec2.CfnEIP(
             self,
             "PublicInstanceEIPFlyon21HW12",
@@ -219,7 +219,7 @@ class EC2Stack(Stack):
             tags=[{"key": "name", "value": "Flyon21-Public-Instance-EIP"}]
         )
 
-        # Create EC2 Instance in Private Subnet
+        #EC2 Instance in Private Subnet
         private_instance = ec2.Instance(
             self,
             "PrivateEC2InstanceFlyon21HW12",

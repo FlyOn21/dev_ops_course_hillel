@@ -14,7 +14,7 @@ stack = EC2Stack(
     "EC2StackHomeWork12",
     env=cdk.Environment(region="eu-central-1"),
     ssh_public_key=ssh_public_key,
-    allowed_ssh_ip="94.131.197.224"
+    allowed_ssh_ip="<ALLOWED_PUBLICK_IP>"
 )
 cdk.Tags.of(stack).add("dev_ops", "hw12")
 cdk.Tags.of(stack).add("owner", "flyon21")

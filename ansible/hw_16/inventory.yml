@@ -1,0 +1,24 @@
+all:
+  hosts:
+    vm_a:
+      ansible_host: 192.168.122.10
+      ansible_user: flyk8s
+    vm_b:
+      ansible_host: 192.168.122.11
+      ansible_user: flyk8s_w1
+    vm_c:
+      ansible_host: 192.168.122.12
+      ansible_user: flyk8s_w2
+  vars:
+    ansible_password: "{{ vault_ansible_password }}"
+    ansible_become_password: "{{ vault_ansible_become_password }}"
+  children:
+    gateway:
+      hosts:
+        vm_a:
+    database:
+      hosts:
+        vm_b:
+    backend:
+      hosts:
+        vm_c:

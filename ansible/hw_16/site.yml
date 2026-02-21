@@ -1,0 +1,25 @@
+---
+- name: Configure network on all hosts
+  hosts: all
+  become: true
+  roles:
+    - netplan
+
+- name: Configure gateway (IP forwarding + Nginx)
+  hosts: gateway
+  become: true
+  roles:
+    - ip_forward
+    - nginx_proxy
+
+- name: Deploy PostgreSQL database
+  hosts: database
+  become: true
+  roles:
+    - postgresql
+
+- name: Deploy FastAPI application
+  hosts: backend
+  become: true
+  roles:
+    - fastapi_app

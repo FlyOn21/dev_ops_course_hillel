@@ -1,0 +1,71 @@
+---
+- name: Install PostgreSQL
+  ansible.builtin.apt:
+    name:
+      - postgresql
+      - postgresql-contrib
+      - python3-psycopg2
+    state: present
+    update_cache: true
+
+- name: Ensure PostgreSQL is started
+  ansible.builtin.systemd:
+    name: postgresql
+    state: started
+    enabled: true
+
+- name: Get PostgreSQL version directory
+  ansible.builtin.shell: ls /etc/postgresql/
+  register: pg_version
+  changed_when: false
+
+- name: Set PostgreSQL version fact
+  ansible.builtin.set_fact:
+    pg_ver: "{{ pg_version.stdout_lines[0] }}"
+
+- name: Configure PostgreSQL listen addresses
+  ansible.builtin.lineinfile:
+    path: "/etc/postgresql/{{ pg_ver }}/main/postgresql.conf"
+    regexp: "^#?listen_addresses"
+    line: "listen_addresses = 'localhost,192.168.101.10,192.168.100.20'"
+  notify: restart postgresql
+
+- name: Deploy pg_hba.conf
+  ansible.builtin.template:
+    src: pg_hba.conf.j2
+    dest: "/etc/postgresql/{{ pg_ver }}/main/pg_hba.conf"
+    owner: postgres
+    group: postgres
+    mode: "0640"
+  notify: restart postgresql
+
+- name: Create FastAPI database
+  become_user: postgres
+  community.postgresql.postgresql_db:
+    name: "{{ pg_db_name | default('fastapi_db') }}"
+    state: present
+
+- name: Create FastAPI database user
+  become_user: postgres
+  community.postgresql.postgresql_user:
+    name: "{{ pg_db_user | default('fastapi_user') }}"
+    password: "{{ pg_db_password | default('fastapi_pass') }}"
+    state: present
+
+- name: Grant all privileges on database to FastAPI user
+  become_user: postgres
+  community.postgresql.postgresql_privs:
+    db: "{{ pg_db_name | default('fastapi_db') }}"
+    role: "{{ pg_db_user | default('fastapi_user') }}"
+    type: database
+    privs: ALL
+    state: present
+
+- name: Grant pg_read_all_stats to FastAPI user
+  become_user: postgres
+  community.postgresql.postgresql_privs:
+    db: "{{ pg_db_name | default('fastapi_db') }}"
+    role: "{{ pg_db_user | default('fastapi_user') }}"
+    objs: pg_read_all_stats
+    type: group
+    state: present

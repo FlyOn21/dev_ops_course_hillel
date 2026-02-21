@@ -1,0 +1,28 @@
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+{% for iface, cfg in netplan_ethernets.items() %}
+    {{ iface }}:
+      addresses:
+{% for addr in cfg.addresses %}
+        - {{ addr }}
+{% endfor %}
+{% if cfg.nameservers is defined %}
+      nameservers:
+        addresses:
+{% for ns in cfg.nameservers %}
+          - {{ ns }}
+{% endfor %}
+{% endif %}
+{% if cfg.routes is defined %}
+      routes:
+{% for route in cfg.routes %}
+        - to: {{ route.to }}
+          via: {{ route.via }}
+{% if route.metric is defined %}
+          metric: {{ route.metric }}
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endfor %}

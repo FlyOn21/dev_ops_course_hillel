@@ -1,0 +1,25 @@
+---
+- name: Install netplan.io
+  ansible.builtin.apt:
+    name: netplan.io
+    state: present
+    update_cache: true
+
+- name: Remove default netplan configs
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/netplan/00-installer-config.yaml
+    - /etc/netplan/50-cloud-init.yaml
+    - /etc/netplan/90-default.yaml
+  notify: netplan apply
+
+- name: Deploy netplan configuration
+  ansible.builtin.template:
+    src: netplan.yaml.j2
+    dest: /etc/netplan/01-network.yaml
+    owner: root
+    group: root
+    mode: "0600"
+  notify: netplan apply
